@@ -1,0 +1,17 @@
+{
+    "name": "websyspro/core",
+    "description": "Collection of components for frontend and backend",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Websyspro\\Core\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "websyspro",
+            "email": "cpd.emersontsa@gmail.com"
+        }
+    ],
+    "require": {}
+}
