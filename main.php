@@ -12,7 +12,7 @@ class UserModel {
 }
 
 App::create([
-  Module::Models->value => [
+  Module::Models->name => [
     UserModel::class
   ]
 ]);
