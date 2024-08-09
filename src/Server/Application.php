@@ -2,7 +2,7 @@
 
 namespace Websyspro\Core\Server;
 
-class App {
+class Application {
   public function __construct(
     array $modules = []
   ) {
@@ -11,7 +11,7 @@ class App {
 
   static public function create(
     array $modules = []
-  ): App {
+  ): Application {
     return new static(
       $modules
     );
