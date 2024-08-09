@@ -3,6 +3,7 @@
 namespace Websyspro\Core\Server;
 
 use Websyspro\Core\Enums\ContentType;
+use Websyspro\Core\Enums\RequestMethod;
 
 class Request
 {
@@ -62,13 +63,30 @@ class Request
         ContentType::ApplicationJson->value
           => ServerUtils::getBodyApplicationJSON(),
         ContentType::MultipartFormData->value
-          => ServerUtils::getBodyMultipartFormData($this),
+          => $this->getBodyMultipartFormData(),
         ContentType::XWwwFormUrlencoded->value
           => ServerUtils::getBodyFormUrlEncoded()
       };
     }
 
     print_r($this);
+  }
+
+  private function getBodyMultipartFormData(): void {
+    $MultipartFormData = $this->getRequestMethod() !== RequestMethod::POST->name
+      ? MultipartFormData::LoadPHPInput()
+      : MultipartFormData::LoadPost();
+
+    if ($MultipartFormData)
+    {
+      $this->setFiles(
+        $MultipartFormData->getFiles()
+      );
+
+      $this->setBody(
+        $MultipartFormData->getFields()
+      );
+    }    
   }
 
   private function DefineParamsArgs(): void
