@@ -15,6 +15,14 @@ class Reflect
     );
   }
 
+  public static function getAttributesFromReflectClass(
+    string $Controller
+  ): array {
+    return static::getReflectClass(
+      $Controller
+    )->getAttributes();
+  }
+
   public static function getReflectMethod(
     string $reflectClass,
     string $reflectMethod
@@ -24,4 +32,24 @@ class Reflect
       $reflectMethod
     );
   }
+
+  public static function getParametersFromReflectMethod(
+    string $reflectClass,
+    string $reflectMethod
+  ): array {
+    return static::getReflectMethod(
+      $reflectClass,
+      $reflectMethod
+    )->getParameters();
+  }
+  
+  public static function getAttributesFromReflectMethod(
+    string $reflectClass,
+    string $reflectMethod
+  ): array {
+    return static::getReflectMethod(
+      $reflectClass,
+      $reflectMethod
+    )->getAttributes();
+  }  
 }

@@ -12,10 +12,10 @@ class Request
   private string $RequestUri;
   private string $ContentType;
   private int $ContentLength;
-  private mixed $body;
   private mixed $params;
   private FileDataList $FileDataList;
   private FieldDataList $FieldDataList;
+  private array $Params = [];
 
   public function __construct()
   {
@@ -43,6 +43,30 @@ class Request
         ";", $this->ContentType
       );
     }
+  }
+
+  public function UriSufixo(
+    array $ArrayList = []
+  ): string {
+    $ArrayList = array_slice( explode(
+      DIRECTORY_SEPARATOR_LINUX,
+      $_SERVER[ "PATH_INFO" ]
+    ), 4 );
+
+    return implode(
+      DIRECTORY_SEPARATOR_LINUX,
+      $ArrayList
+    );
+  }  
+  
+  public function addParams(string $key, mixed $value): void {
+    $this->Params[$key] = $value;
+  }
+
+  public function getParams(): FieldDataList {
+    return FieldDataList::create(
+      $this->Params
+    );
   }
 
   public function getRequestMethod(): string 
@@ -128,18 +152,11 @@ class Request
   }
 
   private function DefineParamsArgs(): void
-  {
-    // print_r($this);
-  }
+  {}
 
   private function getBody(): mixed
   {
     return $this->FieldDataList->dataList;
-  }
-
-  private function getParams(): mixed
-  {
-    return $this->params;
   }
 
   public function setBody(
@@ -152,5 +169,9 @@ class Request
     FileDataList $fileDataList = null
   ): void {
     $this->FileDataList = $fileDataList;
+  }
+
+  public function getFiles(): mixed {
+    return $this->FileDataList->dataList;
   }
 }
