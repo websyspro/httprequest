@@ -25,8 +25,8 @@ class ControllerList
     Utils::Map($this->moduleControllers, fn(string $controller) => (
       $this->addController(
         ControllerItem::create(
-          controllerRequest: $this->request,
-          controllerResponse: $this->response,
+          controllerRequest: $this->getControllerRquest(),
+          controllerResponse: $this->getControllerResponse(),
           controller: $this->getController($controller),
           controllerUrl: $this->getControllerUrl($controller),
           controllerConstruct: $this->getControllerConstruct($controller),
@@ -34,6 +34,14 @@ class ControllerList
         )
       )
     ));
+  }
+
+  public function getControllerRquest(): Request {
+    return $this->request;
+  }
+
+  public function getControllerResponse(): Response {
+    return $this->response;
   }
 
   public function getController(
