@@ -5,10 +5,10 @@ namespace Websyspro\Core\Server;
 class FieldDataList
 {
   public function __construct(
-    public array $dataList = []
+    public mixed $dataList = []
   ){}
 
-  public static function create(array $fieldList = []): FieldDataList
+  public static function create(mixed $fieldList = []): FieldDataList
   {
     return new static($fieldList);
   }

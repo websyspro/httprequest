@@ -3,6 +3,7 @@
 namespace Websyspro\Core\Server;
 
 use Websyspro\Core\Enums\ContentType;
+use Websyspro\Core\Enums\MultipartFormDataAttrs;
 use Websyspro\Core\Enums\RequestMethod;
 
 class Request
@@ -54,22 +55,46 @@ class Request
     return $this->RequestUri;
   }
 
+  public function getFileContents(): mixed
+  {
+    return file_get_contents(
+      MultipartFormDataAttrs::FormDataDefaultFile->value, true 
+    );
+  }  
+
   private function DefineBodyArgs(): void 
   {
     if ($this->ContentLength !== 0)
     {
-      $this->body = match( $this->ContentType )
+      switch( $this->ContentType )
       {
-        ContentType::ApplicationJson->value
-          => ServerUtils::getBodyApplicationJSON(),
-        ContentType::MultipartFormData->value
-          => $this->getBodyMultipartFormData(),
-        ContentType::XWwwFormUrlencoded->value
-          => ServerUtils::getBodyFormUrlEncoded()
+        case ContentType::ApplicationJson->value:
+          $this->getBodyApplicationJSON();
+            break;
+        case ContentType::MultipartFormData->value:
+          $this->getBodyMultipartFormData();
+            break;
+        case ContentType::XWwwFormUrlencoded->value:
+          $this->getBodyFormUrlEncoded();
+            break;
       };
     }
+  }
 
-    print_r($this);
+  public function getBodyApplicationJSON(): void
+  {
+    $ApplicationJSON = json_decode(
+      $this->getFileContents()
+    );
+
+    if ($ApplicationJSON)
+    {
+      $this->setBody(
+        FieldDataList::create(
+          $ApplicationJSON
+        )
+      );
+    }    
   }
 
   private function getBodyMultipartFormData(): void {
@@ -87,6 +112,19 @@ class Request
         $MultipartFormData->getFields()
       );
     }    
+  }
+
+  public function getBodyFormUrlEncoded(): void {
+    parse_str( $this->getFileContents(), $FormUrlEncoded);
+    
+    if ($FormUrlEncoded)
+    {
+      $this->setBody(
+        FieldDataList::create(
+          $FormUrlEncoded
+        )
+      );
+    }
   }
 
   private function DefineParamsArgs(): void

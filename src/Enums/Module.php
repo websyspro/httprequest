@@ -3,5 +3,6 @@
 namespace Websyspro\Core\Enums;
 
 enum Module {
-  case Models; 
+  case Models;
+  case Controllers;
 }
