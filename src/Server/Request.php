@@ -45,7 +45,7 @@ class Request
     }
   }
 
-  public function UriSufixo(
+  public function uriSufixo(
     array $ArrayList = []
   ): string {
     $ArrayList = array_slice( explode(
@@ -57,7 +57,16 @@ class Request
       DIRECTORY_SEPARATOR_LINUX,
       $ArrayList
     );
-  }  
+  }
+
+  public function getApiBase(
+  ): string {
+    return implode( "", [
+      DIRECTORY_SEPARATOR_LINUX,
+      API_BASE,
+      DIRECTORY_SEPARATOR_LINUX
+    ]);
+  }
   
   public function addParams(string $key, mixed $value): void {
     $this->Params[$key] = $value;

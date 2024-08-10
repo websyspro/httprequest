@@ -2,7 +2,7 @@
 
 namespace Websyspro\Core\Enums;
 
-enum Module {
-  case Models;
-  case Controllers;
+class Module {
+  public const Models = "Models";
+  public const Controllers = "Controllers";
 }

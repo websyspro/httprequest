@@ -7,8 +7,8 @@ use Websyspro\Core\Enums\HttpStatus;
 
 class Response
 {
-  public const tokenSuccess = "success";
-  public const tokenContent = "content";
+  public const success = "success";
+  public const content = "content";
 
   public function HeaderJSON(
   ): void {
@@ -38,26 +38,47 @@ class Response
   ): void {
     $this->HeaderJSON();
     $this->HeaderStatusOk();
-    exit(json_encode([
-      Response::tokenSuccess => true,
-      Response::tokenContent => $Content
-    ]));
+
+    exit (
+      json_encode([
+        Response::success => true,
+        Response::content => $Content
+      ])
+    );
   }
 
-  public function sendError(
-    mixed $HttpText,
-    int $HttpError
+  public function Error(
+    mixed $HttpContext,
+      int $HttpError = 0
   ): void {
     $this->HeaderJSON();
-    $this->HeaderError($HttpError);
-    exit(json_encode([
-      Response::tokenSuccess => false,
-      Response::tokenContent => $HttpText
-    ]));
+    
+    if($HttpContext instanceof HttpError)
+    {
+      $this->HeaderError(
+        $HttpContext->ExceptionCode
+      );
+      exit (
+        json_encode([
+          Response::success => false,
+          Response::content => $HttpContext->ExceptionText
+        ])
+      );      
+    } 
+    else
+    {
+      $this->HeaderError(
+        $HttpError
+      );
+
+      exit(json_encode([
+        Response::success => false,
+        Response::content => $HttpContext
+      ]));
+    }
   }  
   
-  public static function create(): Response
-  {
+  public static function create(): Response {
     return new static();
   }
 }

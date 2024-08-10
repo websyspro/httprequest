@@ -23,16 +23,16 @@ class UserController
     private string $UserId
   ){}
 
-  #[HttpPost("")]
   #[Authorize()]
+  #[HttpPost("")]
   function PostUser(
     #[Body()] array $body
   ): array {
     return [];
   }  
 
-  #[HttpPost("create")]
   #[Authorize()]
+  #[HttpPost("create")]
   function CreateUser(
     #[Body()] array $body
   ): array {
@@ -41,10 +41,10 @@ class UserController
 }
 
 Application::create([
-  Module::Controllers->name => [
+  Module::Controllers => [
     UserController::class
   ],
-  Module::Models->name => [
+  Module::Models => [
     UserModel::class
   ]
 ]);

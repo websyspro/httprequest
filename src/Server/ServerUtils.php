@@ -20,9 +20,17 @@ class ServerUtils
     );
   }
 
-  public static function GetApiBase(
+  public static function setDropBarAfter(
+    string $path
   ): string {
-    return API_BASE;
+    return preg_replace(
+      "/\/$/", "", $path
+    );
+  }
+
+  public static function getApiBase(
+  ): string {
+    return DIRECTORY_SEPARATOR_LINUX . API_BASE;
   }
 
   public static function GetApiBarSep(

@@ -13,6 +13,7 @@ class Application
 {
   private Request $Request;
   private Response $Response;
+  private ControllerList $ControllerList;
   private array $Controllers;
   private array $Models;
 
@@ -21,9 +22,11 @@ class Application
   ) {
     $this->CreateApp();
     $this->CreateControllers();
-    $this->CreateControllersFilter();
-    $this->CreateControllersRoutersFilter();
-    $this->CreateControllersExecute();
+    // $this->CreateControllersFilter();
+    // $this->CreateControllersRoutersFilter();
+    // $this->CreateControllersExecute();
+
+    print_r($this);
   }
 
   public function CreateApp(): void {
@@ -31,33 +34,39 @@ class Application
     $this->Response = Response::create();
   }
 
+  public function getModules(): array {
+    return $this->Modules[Module::Controllers];
+  }
+
   public function CreateControllers(): void
   {
-    $this->Controllers = Utils::Map(
-      $this->Modules[Module::Controllers->name], fn($Controller) => [
-        ControllerStructure::RequestController => ServerUtils::getControllerName($Controller),
-        ControllerStructure::RequestApi => ServerUtils::GetControllerApi($Controller),
-        ControllerStructure::RequestContruct => ServerUtils::GetConstruct($Controller),
-        ControllerStructure::RequestMiddleware => ServerUtils::GetMiddlewares($Controller),
-        ControllerStructure::RequestRoutes => ServerUtils::GetMethods($Controller),
-      ]
+    $this->ControllerList = ControllerList::create(
+      $this->Request, $this->Response, $this->getModules()
     );
   }
 
-  public function CreateControllersFilter(): void
+  public function CreateControllersFilter(int $pathArr = 0): void
   {
-    [ , $apiBase, $apiVersion, $apiController ] = explode(
+    $pathArr = explode(
       DIRECTORY_SEPARATOR_LINUX, $this->Request->getRequestUri()
     );
 
-    $this->Controllers = Utils::Filter(
-      $this->Controllers, 
-        fn($Controller) => $Controller[
-          ControllerStructure::RequestApi
-        ] === implode( DIRECTORY_SEPARATOR_LINUX, [
-          $apiBase, $apiVersion, $apiController
-        ])
-    );
+    if(sizeof($pathArr) >= 4)
+    {
+      [, $apiBase, $apiVersion, $apiController] = $pathArr;
+  
+      $this->Controllers = Utils::Filter($this->Controllers, 
+        function($Controller) use( $apiBase, $apiVersion, $apiController ) {
+          return $Controller[
+            ControllerStructure::RequestApi
+          ] === implode( "", [
+            DIRECTORY_SEPARATOR_LINUX, $apiBase,
+            DIRECTORY_SEPARATOR_LINUX, $apiVersion,
+            DIRECTORY_SEPARATOR_LINUX, $apiController
+          ]);
+        }
+      );    
+    }
   }
 
   public function FilterValidMethodType(
@@ -76,7 +85,7 @@ class Application
   ) : bool {
    if (preg_match($RegExpValidedRouter, $Route[MethodStructure::MethodUri])) {
      $RouteController = explode(DIRECTORY_SEPARATOR_LINUX, $Route[MethodStructure::MethodUri]);
-     $RouteRequest = explode(DIRECTORY_SEPARATOR_LINUX, $this->Request->UriSufixo());
+     $RouteRequest = explode(DIRECTORY_SEPARATOR_LINUX, $this->Request->uriSufixo());
 
      if (sizeof($RouteController) !== sizeof($RouteRequest)) {
        return false;
@@ -108,13 +117,19 @@ class Application
 
           switch($ParamType){
             case "int":
-              $this->Request->addParams($ParamString, (int)$RouteRequest[$Key]);
+              $this->Request->addParams(
+                $ParamString, (int)$RouteRequest[$Key]
+              );
               break;
             case "string":
-              $this->Request->addParams($ParamString, (string)$RouteRequest[$Key]);
+              $this->Request->addParams(
+                $ParamString, (string)$RouteRequest[$Key]
+              );
               break;
             default:
-              $this->Request->addParams($ParamString, (string)$RouteRequest[$Key]);
+              $this->Request->addParams(
+                $ParamString, (string)$RouteRequest[$Key]
+              );
            }
          }
        });
@@ -122,17 +137,13 @@ class Application
      } else return false;
    } else {
      return $Route[MethodStructure::MethodUri]
-        === $this->Request->UriSufixo();
+        === $this->Request->uriSufixo();
     }
-  } 
-  
-  public function IsHealth(
-  ): bool {
-    return implode(
-      ServerUtils::GetApiBarSep(), [ 
-        ServerUtils::GetApiBase()
-      ]
-    ) === $this->Request->getRequestUri();
+  }
+
+  public function IsHealth(): bool {
+    return ServerUtils::setDropBarAfter($this->Request->getApiBase()) 
+       === ServerUtils::setDropBarAfter($this->Request->getRequestUri());
   }
 
   public function CreateControllersRoutersFilter(): void
@@ -150,19 +161,50 @@ class Application
     );
   } 
 
-  public function CreateControllersExecute(): void
+  public function isRequestMethodOptions(): void
   {
-    if ($this->Request->getRequestMethod() === HttpType::OPTIONS)
+    if($this->Request->getRequestMethod() === HttpType::OPTIONS)
     {
       $this->Response->Send(
         HttpStatus::Ok
       );
     }
+  }
 
-    if ($this->IsHealth()) {
+  public function isRequestHealth(): void
+  {
+    if($this->IsHealth())
+    {
       $this->Response->Send(
         ServerType::SERVER_RUNNING
       );
+    }    
+  }
+
+  public function hasController(): bool {
+    return sizeof($this->Controllers) !== 0;
+  }
+
+  public function isRequestHasController(): void {
+    if ($this->hasController() === false) {
+      $this->Response->Error(
+        HttpError::NotFound()
+      );
+    }
+  }
+
+  public function hasRouteInController(): void {
+    [ $Controller ] = $this->Controllers;
+  }
+
+  public function CreateControllersExecute(): void {
+    $this->isRequestMethodOptions();
+    $this->isRequestHealth();
+    $this->isRequestHasController();
+    
+    if($this->hasController())
+    {
+      $this->hasRouteInController();
     }
   }  
 
