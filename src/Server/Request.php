@@ -8,10 +8,10 @@ use Websyspro\Core\Enums\RequestMethod;
 
 class Request
 {
-  private string $RequestMethod;
-  private string $RequestUri;
-  private string $ContentType;
-  private int $ContentLength;
+  public string $RequestMethod;
+  public string $requestUri;
+  public string $ContentType;
+  public int $ContentLength;
   private mixed $params;
   private FileDataList $FileDataList;
   private FieldDataList $FieldDataList;
@@ -29,12 +29,12 @@ class Request
     return new static();
   }
 
-  public function DefineProperties(): void 
+  private function DefineProperties(): void 
   {
     [ "REQUEST_METHOD" => $this->RequestMethod,
       "CONTENT_LENGTH" => $this->ContentLength,  
       "CONTENT_TYPE" => $this->ContentType,
-      "REQUEST_URI" => $this->RequestUri,
+      "REQUEST_URI" => $this->requestUri,
     ] = $_SERVER;
 
     if (preg_match('/^multipart\/form-data/', $this->ContentType))
@@ -45,7 +45,7 @@ class Request
     }
   }
 
-  public function uriSufixo(
+  private function uriSufixo(
     array $ArrayList = []
   ): string {
     $ArrayList = array_slice( explode(
@@ -59,7 +59,7 @@ class Request
     );
   }
 
-  public function getApiBase(
+  private function getApiBase(
   ): string {
     return implode( "", [
       DIRECTORY_SEPARATOR_LINUX,
@@ -68,11 +68,11 @@ class Request
     ]);
   }
   
-  public function addParams(string $key, mixed $value): void {
+  private function addParams(string $key, mixed $value): void {
     $this->Params[$key] = $value;
   }
 
-  public function getParams(): FieldDataList {
+  private function getParams(): FieldDataList {
     return FieldDataList::create(
       $this->Params
     );
@@ -85,7 +85,7 @@ class Request
 
   public function getRequestUri(): string
   {
-    return $this->RequestUri;
+    return $this->requestUri;
   }
 
   public function getFileContents(): mixed
@@ -114,7 +114,7 @@ class Request
     }
   }
 
-  public function getBodyApplicationJSON(): void
+  private function getBodyApplicationJSON(): void
   {
     $ApplicationJSON = json_decode(
       $this->getFileContents()
@@ -147,7 +147,7 @@ class Request
     }    
   }
 
-  public function getBodyFormUrlEncoded(): void {
+  private function getBodyFormUrlEncoded(): void {
     parse_str( $this->getFileContents(), $FormUrlEncoded);
     
     if ($FormUrlEncoded)

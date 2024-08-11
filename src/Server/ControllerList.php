@@ -6,6 +6,7 @@ use ReflectionAttribute;
 use Websyspro\Core\Common\Utils;
 use Websyspro\Core\Enums\ConstructStructure;
 use Websyspro\Core\Enums\Decoration;
+use Websyspro\Core\Enums\HttpStatus;
 use Websyspro\Core\Enums\Method;
 use Websyspro\Core\Enums\MiddlewareStructure;
 
@@ -18,10 +19,11 @@ class ControllerList
     private Response $response,
     private array $moduleControllers
   ){
-    $this->controllerList();
+    $this->controllerRouterItems();
+    $this->controllerInit();
   }
 
-  public function controllerList(): void {
+  private function controllerRouterItems(): void {
     Utils::Map($this->moduleControllers, fn(string $controller) => (
       $this->addController(
         ControllerItem::create(
@@ -36,15 +38,85 @@ class ControllerList
     ));
   }
 
-  public function getControllerRquest(): Request {
+  private function getRequestPathArr(): array {
+    return explode(
+      DIRECTORY_SEPARATOR_LINUX, preg_replace(
+        "/\/$/", "", $this->request->requestUri
+      ) 
+    );
+  }
+
+  private function isControllerExists(
+    array $controllerArr
+  ): bool {
+    return is_array(
+      $controllerArr
+    ) && sizeof( $controllerArr );
+  }
+
+  /**
+   * @ControllerInit
+   * 
+   * Locate the controller for the requested URL Request
+   * @param: none
+   * **/
+  private function controllerInit(
+  ): void {
+    /**
+     * Search the list of controls
+     * **/
+    if(sizeof($this->getRequestPathArr()) >= 4) {
+      $controllerArr = Utils::Filter($this->controllers, 
+        fn(ControllerItem $controller) => (
+          $this->getRequestControllerBaseUrl() === $controller->controllerUrl
+        )
+      );
+
+      /**
+       * Check if controller exists
+       * **/
+      if($this->isControllerExists($controllerArr)){
+        Utils::Map($controllerArr, 
+          fn(ControllerItem $controllerItem) => (
+            $controllerItem->routeInit()
+          )
+        );
+      } else {
+
+        /**
+         * Mesasge Error Controller NotFound
+         * **/
+        $this->response->Error(
+          "Cannot {$this->request->RequestMethod} {$this->request->requestUri}", HttpStatus::NotFound
+        );
+      }
+    } else {
+
+      /**
+       * Service initialized success message
+       * **/
+      $this->response->Send(
+        "Service initialized success message"
+      );
+    }
+  }
+
+  private function getRequestControllerBaseUrl(): string {
+    [ , $apiBase, $apiVer, $apiController ] = $this->getRequestPathArr();
+    return DIRECTORY_SEPARATOR_LINUX . implode( DIRECTORY_SEPARATOR_LINUX, [
+      $apiBase, $apiVer, $apiController 
+    ]);
+  }
+
+  private function getControllerRquest(): Request {
     return $this->request;
   }
 
-  public function getControllerResponse(): Response {
+  private function getControllerResponse(): Response {
     return $this->response;
   }
 
-  public function getController(
+  private function getController(
     string $controller
   ): string {
     return sprintf(
@@ -52,7 +124,7 @@ class ControllerList
     );
   }
 
-  public function getControllerUrl(
+  private function getControllerUrl(
     string $controller
   ): string {
     return implode(
@@ -64,7 +136,7 @@ class ControllerList
     ]);    
   }
   
-  public function getControllerConstruct(
+  private function getControllerConstruct(
     string $controller
   ): array {
     $constrctFromController = Utils::Filter(get_class_methods($controller),
@@ -91,7 +163,7 @@ class ControllerList
     ];
   } 
   
-  public function getControllerMiddlewares(
+  private function getControllerMiddlewares(
     string $controller
   ): array {
     $MiddlewareFromController = Utils::Filter(Reflect::getAttributesFromReflectClass($controller),
@@ -106,7 +178,7 @@ class ControllerList
     ]);
   }  
 
-  public function addController(
+  private function addController(
     mixed $controller
   ): void {
     $this->controllers[] = $controller;

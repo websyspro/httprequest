@@ -13,23 +13,22 @@ class Application
 {
   private Request $Request;
   private Response $Response;
-  private ControllerList $ControllerList;
+  private ControllerList $controllerList;
   private array $Controllers;
   private array $Models;
 
   public function __construct(
     private array $Modules = []
   ) {
-    $this->CreateApp();
-    $this->CreateControllers();
+    $this->createApp();
+    $this->createControllers();
+
     // $this->CreateControllersFilter();
     // $this->CreateControllersRoutersFilter();
     // $this->CreateControllersExecute();
-
-    print_r($this);
   }
 
-  public function CreateApp(): void {
+  public function createApp(): void {
     $this->Request = Request::create();
     $this->Response = Response::create();
   }
@@ -38,9 +37,9 @@ class Application
     return $this->Modules[Module::Controllers];
   }
 
-  public function CreateControllers(): void
+  public function createControllers(): void
   {
-    $this->ControllerList = ControllerList::create(
+    $this->controllerList = ControllerList::create(
       $this->Request, $this->Response, $this->getModules()
     );
   }

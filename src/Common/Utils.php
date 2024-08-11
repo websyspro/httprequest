@@ -37,9 +37,9 @@ class Utils
     mixed $iterable,
     callable $callable
   ): array {
-    return array_filter(
+    return array_values( array_filter(
       $iterable, $callable
-    );
+    ));
   }
 
   public static function FilterKey(

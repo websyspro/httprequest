@@ -4,14 +4,14 @@ namespace Websyspro\Core\Server;
 
 class RouterList
 {
-  private array $Routers = [];
+  public array $routers = [];
 
   public function __construct(){}
 
   public function addRouter(
-    mixed $Router
+    mixed $router
   ): void {
-    $this->Routers[] = $Router;
+    $this->routers[] = $router;
   }
 
   public static function create(): RouterList {

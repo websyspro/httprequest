@@ -4,6 +4,7 @@ use Websyspro\Core\Enums\Module;
 use Websyspro\Core\Models\Decorations\Authorize;
 use Websyspro\Core\Models\Decorations\Columns\Varchar;
 use Websyspro\Core\Models\Decorations\Controller;
+use Websyspro\Core\Models\Decorations\Http\HttpGet;
 use Websyspro\Core\Models\Decorations\Http\HttpPost;
 use Websyspro\Core\Models\Decorations\Model;
 use Websyspro\Core\Models\Decorations\Parametros\Body;
@@ -40,9 +41,23 @@ class UserController
   }
 }
 
+#[Controller("client")]
+class ClientController
+{
+  function __construct(
+    private string $ClientId
+  ){}
+
+  #[HttpGet("create")]
+  function createCliente(): array {
+    return [];
+  }
+}
+
 Application::create([
   Module::Controllers => [
-    UserController::class
+    UserController::class,
+    ClientController::class
   ],
   Module::Models => [
     UserModel::class

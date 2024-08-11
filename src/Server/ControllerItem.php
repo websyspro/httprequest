@@ -10,7 +10,7 @@ use Websyspro\Core\Enums\MiddlewareStructure;
 
 class ControllerItem
 {
-  private RouterList $routerList;
+  public RouterList $routerList;
 
   public function __construct(
     public Request $controllerRequest,
@@ -53,14 +53,27 @@ class ControllerItem
     }
   }
 
-  public function getAttributesFromMethods(string $method): array
+  /**
+   * @RouteInit
+   * 
+   * Locate the router for the requested URL Request
+   * @param: none
+   * **/
+  public function routeInit(
+  ): void {
+    Utils::Filter($this->routerList->routers, 
+      fn(RouterItem $routerItem) => var_dump($routerItem->routeUri)
+    );
+  }
+
+  private function getAttributesFromMethods(string $method): array
   {
     return Reflect::getAttributesFromReflectMethod(
       $this->controller, $method
     );
   }
 
-  public function getRoute(string $method): string 
+  private function getRoute(string $method): string 
   {
     $routeFromMethods = Utils::Filter(
       $this->getAttributesFromMethods($method), fn(ReflectionAttribute $Attribute) => (
@@ -80,7 +93,7 @@ class ControllerItem
     );
   }
 
-  public function getRouteUrl(
+  private function getRouteUrl(
     string $method    
   ): string {
     return implode(
@@ -93,13 +106,13 @@ class ControllerItem
     ]);
   }
 
-  public function getRouteName(
+  private function getRouteName(
     string $method
   ): string {
     return $this->controller ? $method : $method;
   } 
   
-  public function getRouteType(
+  private function getRouteType(
     string $method
   ): string {
     $AttributesFromMethod = Reflect::getReflectMethod(
@@ -122,7 +135,7 @@ class ControllerItem
     );
   }
   
-  public function getRouteParameters(
+  private function getRouteParameters(
     string $Method
   ): array {
     $ParametersFromMethod = Reflect::getParametersFromReflectMethod(
@@ -143,7 +156,7 @@ class ControllerItem
     return $AttributesFromParametersFromMethod;
   } 
   
-  public function getRouteMiddleware(
+  private function getRouteMiddleware(
     string $method
   ): array {
     $AttributesFromMethod = Reflect::getAttributesFromReflectMethod(
