@@ -1,5 +1,5 @@
 {
-    "name": "websyspro/core",
+    "name": "websyspro/httprequest",
     "description": "Collection of components for frontend and backend",
     "type": "project",
     "autoload": {
