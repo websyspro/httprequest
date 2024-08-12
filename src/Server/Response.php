@@ -10,6 +10,10 @@ class Response
   public const success = "success";
   public const content = "content";
 
+  public function __construct(
+    private Application $application
+  ){}
+
   public function HeaderJSON(
   ): void {
     header(Header::AccessControlAllowOrigin);
@@ -78,7 +82,11 @@ class Response
     }
   }  
   
-  public static function create(): Response {
-    return new static();
+  public static function create(
+    Application $application
+  ): Response {
+    return new static(
+      $application
+    );
   }
 }

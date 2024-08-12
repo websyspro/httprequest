@@ -25,7 +25,7 @@ class UserController
   ){}
 
   #[Authorize()]
-  #[HttpPost("")]
+  #[HttpGet("")]
   function PostUser(
     #[Body()] array $body
   ): array {
@@ -33,7 +33,7 @@ class UserController
   }  
 
   #[Authorize()]
-  #[HttpPost("create")]
+  #[HttpPost("create/:email")]
   function CreateUser(
     #[Body()] array $body
   ): array {

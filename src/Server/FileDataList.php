@@ -27,10 +27,10 @@ class FileDataList
         {
           $this->dataList[$key][
             match($fileAttrKey){
-              MultipartFormDataAttrs::FormDataFileName->name => "name",
-              MultipartFormDataAttrs::FormDataFileSize->name => "size",
-              MultipartFormDataAttrs::FormDataFileType->name => "type",
-              MultipartFormDataAttrs::FormDataFileBody->name => "body"
+              MultipartFormDataAttrs::FormDataFileName => "name",
+              MultipartFormDataAttrs::FormDataFileSize => "size",
+              MultipartFormDataAttrs::FormDataFileType => "type",
+              MultipartFormDataAttrs::FormDataFileBody => "body"
             }
           ] = $fileAttr[$fileAttrKey];
         }

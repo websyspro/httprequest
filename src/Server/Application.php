@@ -11,45 +11,38 @@ use Websyspro\Core\Enums\ServerType;
 
 class Application
 {
-  private Request $Request;
-  private Response $Response;
-  private ControllerList $controllerList;
+  public Request $request;
+  public Response $response;
   private array $Controllers;
   private array $Models;
 
   public function __construct(
-    private array $Modules = []
+    private array $modules = []
   ) {
     $this->createApp();
     $this->createControllers();
-
-    // $this->CreateControllersFilter();
-    // $this->CreateControllersRoutersFilter();
-    // $this->CreateControllersExecute();
   }
 
   public function createApp(): void {
-    $this->Request = Request::create();
-    $this->Response = Response::create();
-
-    print_r($this->Request);
+    $this->request = Request::create($this);
+    $this->response = Response::create($this);
   }
 
   public function getModules(): array {
-    return $this->Modules[Module::Controllers];
+    return $this->modules[Module::Controllers];
   }
 
   public function createControllers(): void
   {
-    // $this->controllerList = ControllerList::create(
-    //   $this->Request, $this->Response, $this->getModules()
-    // );
+    $this->request->setControllers(
+      $this->modules[ Module::Controllers ]
+    );
   }
 
   public function CreateControllersFilter(int $pathArr = 0): void
   {
     $pathArr = explode(
-      DIRECTORY_SEPARATOR_LINUX, $this->Request->getRequestUri()
+      DIRECTORY_SEPARATOR_LINUX, $this->request->getRequestUri()
     );
 
     if(sizeof($pathArr) >= 4)
@@ -74,7 +67,7 @@ class Application
     array $Route
   ): bool {
     return $Route[MethodStructure::MethodType]
-       === $this->Request->getRequestMethod();
+       === $this->request->getRequestMethod();
   }
 
   public function FilterValidRoute(
@@ -86,7 +79,7 @@ class Application
   ) : bool {
    if (preg_match($RegExpValidedRouter, $Route[MethodStructure::MethodUri])) {
      $RouteController = explode(DIRECTORY_SEPARATOR_LINUX, $Route[MethodStructure::MethodUri]);
-     $RouteRequest = explode(DIRECTORY_SEPARATOR_LINUX, $this->Request->uriSufixo());
+     $RouteRequest = explode(DIRECTORY_SEPARATOR_LINUX, $this->request->uriSufixo());
 
      if (sizeof($RouteController) !== sizeof($RouteRequest)) {
        return false;
@@ -138,13 +131,13 @@ class Application
      } else return false;
    } else {
      return $Route[MethodStructure::MethodUri]
-        === $this->Request->uriSufixo();
+        === $this->request->uriSufixo();
     }
   }
 
   public function IsHealth(): bool {
-    return ServerUtils::setDropBarAfter($this->Request->getApiBase()) 
-       === ServerUtils::setDropBarAfter($this->Request->getRequestUri());
+    return ServerUtils::setDropBarAfter($this->request->getApiBase()) 
+       === ServerUtils::setDropBarAfter($this->request->getRequestUri());
   }
 
   public function CreateControllersRoutersFilter(): void
@@ -164,9 +157,9 @@ class Application
 
   public function isRequestMethodOptions(): void
   {
-    if($this->Request->getRequestMethod() === HttpType::OPTIONS)
+    if($this->request->getRequestMethod() === HttpType::OPTIONS)
     {
-      $this->Response->Send(
+      $this->response->Send(
         HttpStatus::Ok
       );
     }
@@ -176,7 +169,7 @@ class Application
   {
     if($this->IsHealth())
     {
-      $this->Response->Send(
+      $this->response->Send(
         ServerType::SERVER_RUNNING
       );
     }    
@@ -188,7 +181,7 @@ class Application
 
   public function isRequestHasController(): void {
     if ($this->hasController() === false) {
-      $this->Response->Error(
+      $this->response->Error(
         HttpError::NotFound()
       );
     }

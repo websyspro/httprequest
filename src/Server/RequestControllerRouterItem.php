@@ -2,11 +2,9 @@
 
 namespace Websyspro\Core\Server;
 
-class RouterItem
+class RequestControllerRouterItem
 {
   public function __construct(
-    public Request $request,
-    public Response $response,
     public string $route,
     public string $routeUri,
     public string $routeName,
@@ -16,18 +14,14 @@ class RouterItem
   ){}
 
   public static function create(
-    Request $request,
-    Response $response,    
     string $route,
     string $routeUri,
     string $routeName,
     string $routeMethodType,
      array $routeParameters,
      array $routeMiddleware
-  ): RouterItem {
+  ): RequestControllerRouterItem {
     return new static(
-      request: $request,
-      response: $response,
       route: $route,
       routeUri: $routeUri,
       routeName: $routeName,

@@ -330,7 +330,7 @@ class MultipartFormData
           $file = (object)$file;
 
           return [
-            MultipartFormDataAttrs::FormDataFileName => $file,
+            MultipartFormDataAttrs::FormDataFileName => $file->name,
             MultipartFormDataAttrs::FormDataFileSize => $file->size,
             MultipartFormDataAttrs::FormDataFileType => pathinfo(
               $file->name, PATHINFO_EXTENSION

@@ -2,7 +2,9 @@
 
 namespace Websyspro\Core\Server;
 
+use Websyspro\Core\Common\Utils;
 use Websyspro\Core\Enums\ContentType;
+use Websyspro\Core\Enums\HttpStatus;
 use Websyspro\Core\Enums\MultipartFormDataAttrs;
 use Websyspro\Core\Enums\RequestMethod;
 
@@ -11,12 +13,27 @@ class Request
   /**
    * @var string
    * **/  
-  public string $requestMethod;
+  private string $requestMethod;
 
   /**
    * @var string
    * **/
-  public string $requestUri;
+  private string $requestUri;
+
+  /**
+   * @var string
+   * **/
+  private string $requestUriFull;
+  
+  /**
+   * @var string
+   * **/
+  private string $requestRouteUri = "";
+
+  /**
+   * @var int
+   * **/  
+  private int $requestRouteUriLength = 0;
 
   /**
    * @var string
@@ -31,22 +48,22 @@ class Request
   /**
    * @var string
    * **/
-  public string $controller;
+  private string $controller;
 
   /**
    * @var bool
    * **/
-  public bool $apiIsHealth = false;
+  private bool $apiIsHealth = false;
 
   /**
    * @var string
    * **/
-  public string $contentType;
+  private string $contentType;
 
   /**
    * @var int
    * **/
-  public int $contentLength;
+  private int $contentLength;
 
   /**
    * @var object<FileDataList>
@@ -59,6 +76,11 @@ class Request
   private FieldDataList $FieldDataList;
 
   /**
+   * @var object<FieldDataList>
+   * **/  
+  private FieldDataList $QueryDataList;
+
+  /**
    * @var string
    * **/   
   private string $requestParamsStr;
@@ -69,12 +91,28 @@ class Request
   private array $requestParams = [];
 
   /**
+   * @var string
+   * **/   
+  private string $requestQuerysStr;
+
+  /**
+   * @var array
+   * **/
+  private array $requestQuerys = [];
+
+  /**
+   * @var array
+   * **/
+  private array $controllerArr = [];
+
+  /**
    * @Construct
    * 
    * Create Request Object
    * @param: <none>
    * **/
   public function __construct(
+    private Application $application
   ){
     $this->setProperties();
     $this->setBodyArgs();
@@ -88,8 +126,11 @@ class Request
    * @return object<Request>
    * **/
   public static function create(
+    Application $application
   ): Request {
-    return new static();
+    return new static(
+      $application
+    );
   }
 
   /**
@@ -105,6 +146,7 @@ class Request
       "CONTENT_LENGTH" => $this->contentLength,  
       "CONTENT_TYPE" => $this->contentType,
       "REQUEST_URI" => $this->requestUri,
+      "REQUEST_URI" => $this->requestUriFull,
     ] = $_SERVER;
 
     /**
@@ -112,7 +154,7 @@ class Request
      * checking if there is?
      * **/
     if (preg_match("/\?/", $this->requestUri)) {
-      [ $this->requestUri, $this->requestParamsStr ] = explode(
+      [ $this->requestUri, $this->requestQuerysStr ] = explode(
         "?", $this->requestUri
       );
 
@@ -120,8 +162,8 @@ class Request
        * Define string to var parameters
        * **/
       parse_str(
-        $this->requestParamsStr, 
-        $this->requestParams
+        $this->requestQuerysStr, 
+        $this->requestQuerys
       );
     }
 
@@ -141,6 +183,19 @@ class Request
       [, $this->apiBase, $this->apiVersion, $this->controller ] = explode(
         DIRECTORY_SEPARATOR_LINUX, $this->requestUri
       );
+
+      /**
+       * Define 
+       * ***/
+      if (sizeof(explode("/", $this->requestUri)) >= 5){
+        [, $this->requestRouteUri ] = explode(
+          $this->controller, $this->requestUri
+        );
+
+        $this->requestRouteUriLength = sizeof(explode(
+          DIRECTORY_SEPARATOR_LINUX, preg_replace( "/^\//", "", $this->requestRouteUri )
+        ));
+      }
     } else {
       /**
        * Define $apiIsHealth is true 
@@ -253,6 +308,73 @@ class Request
       $this->FieldDataList = FieldDataList::create(
         $formUrlEncoded
       );
+    }
+  }
+
+  /**
+   * @SetControllers
+   * 
+   * List all controls and define them
+   * @param: <array> $controllers
+   * @return <void>
+   * **/
+  public function setControllers(
+    array $controllers = []
+  ): void {
+    /**
+     * You should populate the list of controllers only if a controller exists in the URL
+     * **/
+    if($this->apiIsHealth === false){
+      /**
+       * Start Loop
+       * **/
+      Utils::Map($controllers, function(string $controller){
+        /**
+         * Create RequestController Object
+         * **/
+        $RquestController = RequestController::create(
+          controller: $controller
+        );
+
+        /**
+         * Popular list of controls within the request
+         * **/
+        $this->controllerArr[ $RquestController->requestControllerItem->controllerName ] = RequestController::create(
+          controller: $controller
+        );
+      });
+
+      /**
+       * Check if the controller exists
+       * **/
+      if (isset($this->controllerArr[$this->controller]) === false){
+        $this->application->response->Error(
+          "Cannot {$this->requestMethod} {$this->requestUriFull}", HttpStatus::NotFound
+        );
+      } else {
+
+        /**
+         * Check if a route with the same post method exists
+         * **/
+        $preFiltersRouters = Utils::Filter($this->controllerArr[$this->controller]->requestControllerItem->routerList->routers, function(RequestControllerRouterItem $requestControllerRouterItem) {
+          [, $route] = explode($this->controller, $requestControllerRouterItem->routeUri);
+
+          return $requestControllerRouterItem->routeMethodType === $this->requestMethod && $this->requestRouteUriLength === (
+            empty( preg_replace( "/^\//", "", $route )) ? 0 : sizeof(
+              explode(DIRECTORY_SEPARATOR_LINUX, preg_replace( "/^\//", "", $route ))
+            )
+          );
+        });
+
+        /**
+         * Check if the route exists
+         * **/
+        if (sizeof($preFiltersRouters) === 0) {
+          $this->application->response->Error(
+            "Cannot {$this->requestMethod} {$this->requestUriFull}", HttpStatus::NotFound
+          );
+        }
+      }
     }
   }
 

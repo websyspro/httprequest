@@ -8,15 +8,14 @@ use Websyspro\Core\Enums\Decoration;
 use Websyspro\Core\Enums\Method;
 use Websyspro\Core\Enums\MiddlewareStructure;
 
-class ControllerItem
+class RequestControllerItem
 {
   public RouterList $routerList;
 
   public function __construct(
-    public Request $controllerRequest,
-    public Response $controllerResponse,
     public string $controller,
     public string $controllerUrl,
+    public string $controllerName,
     public array $controllerConstruct,
     public array $controllerMiddlewares,
   ){
@@ -33,13 +32,10 @@ class ControllerItem
         )
       );
 
-      if (sizeof($methodsInController))
-      {
+      if (sizeof($methodsInController)){
         Utils::Map($methodsInController, fn($method) => (
           $this->routerList->addRouter(
-            RouterItem::create(
-              request: $this->controllerRequest,
-              response: $this->controllerResponse,
+            RequestControllerRouterItem::create(
               route: $this->getRoute($method),
               routeUri: $this->getRouteUrl($method),
               routeName: $this->getRouteName($method),
@@ -51,19 +47,6 @@ class ControllerItem
         ));
       };
     }
-  }
-
-  /**
-   * @RouteInit
-   * 
-   * Locate the router for the requested URL Request
-   * @param: none
-   * **/
-  public function routeInit(
-  ): void {
-    Utils::Filter($this->routerList->routers, 
-      fn(RouterItem $routerItem) => var_dump($routerItem->routeUri)
-    );
   }
 
   private function getAttributesFromMethods(string $method): array
@@ -178,18 +161,16 @@ class ControllerItem
   }  
 
   public static function create(
-    Request $controllerRequest,
-    Response $controllerResponse,
     string $controller,
     string $controllerUrl,
+    string $controllerName,
      array $controllerConstruct,
      array $controllerMiddlewares
-  ): ControllerItem {
+  ): RequestControllerItem {
     return new static(
       controller: $controller,
       controllerUrl: $controllerUrl,
-      controllerRequest: $controllerRequest,
-      controllerResponse: $controllerResponse,
+      controllerName: $controllerName,
       controllerConstruct: $controllerConstruct,
       controllerMiddlewares: $controllerMiddlewares
     );
