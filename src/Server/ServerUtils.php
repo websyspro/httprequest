@@ -221,25 +221,4 @@ class ServerUtils
       ]
     );
   } 
-
-  public static function GetMethods(
-    string $Controller
-  ): array {
-    $MethodsFromController = Utils::Filter(get_class_methods($Controller),
-      fn($Method) => $Method !== Method::Contruct
-    );
-
-    $MethodsFromController = Utils::Map($MethodsFromController,
-      fn($Method) => [
-        MethodStructure::MethodApi => static::GetMethodApi($Controller, $Method),
-        MethodStructure::MethodUri => static::GetRoute($Controller, $Method),
-        MethodStructure::MethodName => static::GetMethodName($Controller, $Method),
-        MethodStructure::MethodType => static::GetMethodType($Controller, $Method),
-        MethodStructure::MethodParameters => static::GetMethodParameters($Controller, $Method),
-        MethodStructure::MethodMiddleware => static::GetMethodMiddleware($Controller, $Method),
-      ]
-    );
-
-    return $MethodsFromController;
-  }  
 }

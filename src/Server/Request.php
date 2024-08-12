@@ -2,9 +2,12 @@
 
 namespace Websyspro\Core\Server;
 
+use ReflectionClass;
 use Websyspro\Core\Common\Utils;
+use Websyspro\Core\Enums\ConstructStructure;
 use Websyspro\Core\Enums\ContentType;
 use Websyspro\Core\Enums\HttpStatus;
+use Websyspro\Core\Enums\MiddlewareStructure;
 use Websyspro\Core\Enums\MultipartFormDataAttrs;
 use Websyspro\Core\Enums\RequestMethod;
 
@@ -68,17 +71,12 @@ class Request
   /**
    * @var object<FileDataList>
    * **/  
-  private FileDataList $FileDataList;
+  public FileDataList $fileDataList;
 
   /**
    * @var object<FieldDataList>
    * **/ 
-  private FieldDataList $FieldDataList;
-
-  /**
-   * @var object<FieldDataList>
-   * **/  
-  private FieldDataList $QueryDataList;
+  public FieldDataList $fieldDataList;
 
   /**
    * @var string
@@ -88,7 +86,7 @@ class Request
   /**
    * @var array
    * **/
-  private array $requestParams = [];
+  public array $requestParams = [];
 
   /**
    * @var string
@@ -98,7 +96,7 @@ class Request
   /**
    * @var array
    * **/
-  private array $requestQuerys = [];
+  public array $requestQuerys = [];
 
   /**
    * @var array
@@ -143,11 +141,18 @@ class Request
   private function setProperties(
   ): void {
     [ "REQUEST_METHOD" => $this->requestMethod,
-      "CONTENT_LENGTH" => $this->contentLength,  
-      "CONTENT_TYPE" => $this->contentType,
       "REQUEST_URI" => $this->requestUri,
       "REQUEST_URI" => $this->requestUriFull,
     ] = $_SERVER;
+
+    if(isset($_SERVER["CONTENT_LENGTH"]) && isset($_SERVER["CONTENT_TYPE"])){
+      [ "CONTENT_LENGTH" => $this->contentLength, 
+        "CONTENT_TYPE" => $this->contentType, 
+      ] = $_SERVER;    
+    } else {
+      $this->contentType = ContentType::ApplicationJson;
+      $this->contentLength = 0;
+    }
 
     /**
      * Split request url with question mark,
@@ -267,8 +272,8 @@ class Request
      * Definir $FieldDataList from Object FieldDatalist
      * **/
     if ($ApplicationJSON){
-      $this->FieldDataList = FieldDataList::create(
-        $ApplicationJSON
+      $this->fieldDataList = FieldDataList::create(
+        (array)$ApplicationJSON
       );
     }
   }  
@@ -287,8 +292,8 @@ class Request
     } else $MultipartFormData = MultipartFormData::LoadPost();
 
     if ($MultipartFormData) {
-      $this->FileDataList = $MultipartFormData->getFiles();
-      $this->FieldDataList = $MultipartFormData->getFields();
+      $this->fileDataList = $MultipartFormData->getFiles();
+      $this->fieldDataList = $MultipartFormData->getFields();
     }    
   }
 
@@ -305,9 +310,108 @@ class Request
     ), $formUrlEncoded);
     
     if ($formUrlEncoded) {
-      $this->FieldDataList = FieldDataList::create(
+      $this->fieldDataList = FieldDataList::create(
         $formUrlEncoded
       );
+    }
+  }
+
+  /**
+   * @IsControllerRouteValid
+   * 
+   * List all controls and define them
+   * @param: <array> $controllers
+   * @return <void>
+   * **/  
+  private function isControllerRouteValid(
+    string $routeUri,
+     array $routeUriArr = [],
+     array $requestUriArr = [],
+     array $routeUriPaths = [],
+  ): bool {
+    $routeUriArr = explode(DIRECTORY_SEPARATOR_LINUX, $routeUri);
+    $requestUriArr = explode(DIRECTORY_SEPARATOR_LINUX, $this->requestUri);
+
+    /**
+     * Route not exactly exactly the same
+     * **/
+    if (preg_match("/\:/", $routeUri)) {
+      $routeUriPaths = Utils::MapKey($routeUriArr, fn($path, $key) => (
+        $path === $requestUriArr[$key] || preg_match("/\:/", $path)
+      ));
+
+      return in_array(
+        false, $routeUriPaths
+      ) === false;
+    } else {
+
+      /**
+       * Exactly the same route
+       * **/
+      $routeUriPaths = Utils::MapKey($routeUriArr, fn($path, $key) => (
+        $path === $requestUriArr[$key]
+      ));    
+
+      return in_array(
+        false, $routeUriPaths
+      ) === false;
+    }
+  }
+
+  /**
+   * @GetParamsFromRequest
+   * 
+   * List all controls and define them
+   * @param: <array> $controllers
+   * @return <void>
+   * **/  
+  private function getParamsFromRequest(
+    string $routeUri,
+     array $routeUriArr = [],
+     array $requestUriArr = []
+  ): void {
+    $routeUriArr = explode(DIRECTORY_SEPARATOR_LINUX, $routeUri);
+    $requestUriArr = explode(DIRECTORY_SEPARATOR_LINUX, $this->requestUri);
+
+    /**
+     * Route not exactly exactly the same
+     * **/
+    foreach($routeUriArr as $key => $path) {
+      if(preg_match("/\:/", $path)){
+        $this->requestParams[
+          preg_replace("/^\:/", "", $path)
+        ] = $requestUriArr[$key];
+      }
+    }
+  }  
+
+  /**
+   * @ExecuteMiddleware
+   * 
+   * Run Middleware Listing
+   * @param: <array> $controllers
+   * @return <void>
+   * **/  
+  public function executeMiddleware(
+    array $middlewares = []
+  ): void {
+    if (sizeof($middlewares) !== 0) {
+      Utils::Map($middlewares, function(array $middleware){
+        /**
+         * Create Instance from middleware
+         * **/
+        $middlewareInstance = call_user_func_array([
+          new ReflectionClass($middleware[MiddlewareStructure::InstanceClass]), ConstructStructure::MethodNewInstance
+        ], $middleware[MiddlewareStructure::ArgsClass]);
+
+        /**
+         * call methodo Execute from middleware 
+         * **/
+        $middlewareInstance->Execute(
+          $this->application->request,
+          $this->application->response
+        );
+      });
     }
   }
 
@@ -362,8 +466,7 @@ class Request
           return $requestControllerRouterItem->routeMethodType === $this->requestMethod && $this->requestRouteUriLength === (
             empty( preg_replace( "/^\//", "", $route )) ? 0 : sizeof(
               explode(DIRECTORY_SEPARATOR_LINUX, preg_replace( "/^\//", "", $route ))
-            )
-          );
+            )) && $this->isControllerRouteValid($requestControllerRouterItem->routeUri);
         });
 
         /**
@@ -373,6 +476,67 @@ class Request
           $this->application->response->Error(
             "Cannot {$this->requestMethod} {$this->requestUriFull}", HttpStatus::NotFound
           );
+        } else {
+          
+          /**
+           * Run Middleware list from controllers
+           * **/
+          $this->executeMiddleware($this->controllerArr[$this->controller]->requestControllerItem->controllerMiddlewares);
+
+          /**
+           * Create instance of the controller class
+           * **/
+          $controllerClass = call_user_func_array([
+            new ReflectionClass($this->controllerArr[$this->controller]->requestControllerItem->controller), ConstructStructure::MethodNewInstance
+          ], Utils::Map($this->controllerArr[$this->controller]->requestControllerItem->controllerConstruct[ConstructStructure::MethodParameters], fn($parameter) => (
+            new $parameter()
+          )));
+
+          /**
+           * Pesquisar por routas exatamente iguais 
+           * **/
+          [ $requestControllerRouterItem ] = $preFiltersRouters;
+
+          /**
+           * Verificar se exists requestControllerRouterItem
+           * **/
+          if( $requestControllerRouterItem instanceof RequestControllerRouterItem ){
+            /**
+             * Define var from params
+             * **/  
+            $this->getParamsFromRequest($requestControllerRouterItem->routeUri);
+
+            /**
+             * Run Middleware list from router
+             * **/
+            $this->executeMiddleware($requestControllerRouterItem->routeMiddleware);
+
+            /**
+             * Execute method from routers
+             * **/            
+            $resultControllerMethod = call_user_func_array([
+              $controllerClass, $requestControllerRouterItem->routeName
+            ], Utils::Map($requestControllerRouterItem->routeParameters, fn($parameter) => (
+              (new $parameter())->Execute(
+                $this->application->request,
+                $this->application->response
+              )
+            )));
+
+            /**
+             * Check if there are errors
+             * **/
+            if ($resultControllerMethod instanceof HttpError){
+              $this->application->response->Error(
+                $resultControllerMethod->ExceptionText,
+                $resultControllerMethod->ExceptionCode
+              );
+            } else {
+              $this->application->response->Send(
+                $resultControllerMethod
+              );
+            }
+          }
         }
       }
     }
@@ -427,19 +591,5 @@ class Request
 
 
 
-  public function setBody(
-    FieldDataList $fieldDataList = null
-  ): void {
-    $this->FieldDataList = $fieldDataList;
-  }
-
-  public function setFiles(
-    FileDataList $fileDataList = null
-  ): void {
-    $this->FileDataList = $fileDataList;
-  }
-
-  public function getFiles(): mixed {
-    return $this->FileDataList->dataList;
-  }
+ 
 }

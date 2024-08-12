@@ -8,7 +8,7 @@ use Websyspro\Core\Server\Response;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-class Body
+class Query
 {
   public const TypeDecoration = Decoration::RouteParameters;
 
@@ -19,8 +19,8 @@ class Body
     Request $request,
     Response $response
   ): array {
-    if(isset($request->fieldDataList->dataList)){
-      return $request->fieldDataList->dataList;
+    if(isset($request->requestQuerys)){
+      return $request->requestQuerys;
     } else return [];
   }  
 }
