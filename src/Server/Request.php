@@ -1,15 +1,15 @@
 <?php
 
-namespace Websyspro\Core\Server;
+namespace Websyspro\HttpRequest\Server;
 
 use ReflectionClass;
-use Websyspro\Core\Common\Utils;
-use Websyspro\Core\Enums\ConstructStructure;
-use Websyspro\Core\Enums\ContentType;
-use Websyspro\Core\Enums\HttpStatus;
-use Websyspro\Core\Enums\MiddlewareStructure;
-use Websyspro\Core\Enums\MultipartFormDataAttrs;
-use Websyspro\Core\Enums\RequestMethod;
+use Websyspro\HttpRequest\Common\Utils;
+use Websyspro\HttpRequest\Enums\ConstructStructure;
+use Websyspro\HttpRequest\Enums\ContentType;
+use Websyspro\HttpRequest\Enums\HttpStatus;
+use Websyspro\HttpRequest\Enums\MiddlewareStructure;
+use Websyspro\HttpRequest\Enums\MultipartFormDataAttrs;
+use Websyspro\HttpRequest\Enums\RequestMethod;
 
 class Request
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace Websyspro\Core\Models\Decorations;
+namespace Websyspro\HttpRequest\Models\Decorations;
 
-use Websyspro\Core\Enums\Decoration;
-use Websyspro\Core\Server\Request;
-use Websyspro\Core\Server\Response;
+use Websyspro\HttpRequest\Enums\Decoration;
+use Websyspro\HttpRequest\Server\Request;
+use Websyspro\HttpRequest\Server\Response;
 use Attribute;
-use Websyspro\Core\Enums\HttpStatus;
+use Websyspro\HttpRequest\Enums\HttpStatus;
 
 #[Attribute(
   Attribute::TARGET_CLASS |

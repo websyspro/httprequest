@@ -1,9 +1,9 @@
 <?php
 
-namespace Websyspro\Core\Server;
+namespace Websyspro\HttpRequest\Server;
 
-use Websyspro\Core\Enums\Header;
-use Websyspro\Core\Enums\HttpStatus;
+use Websyspro\HttpRequest\Enums\Header;
+use Websyspro\HttpRequest\Enums\HttpStatus;
 
 class Response
 {

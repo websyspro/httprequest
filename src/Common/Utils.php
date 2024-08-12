@@ -1,6 +1,6 @@
 <?php
 
-namespace Websyspro\Core\Common;
+namespace Websyspro\HttpRequest\Common;
 
 class Utils
 {

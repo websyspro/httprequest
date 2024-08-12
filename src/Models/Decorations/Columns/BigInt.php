@@ -1,6 +1,6 @@
 <?php
 
-namespace Websyspro\Core\Models\Decorations\Columns;
+namespace Websyspro\HttpRequest\Models\Decorations\Columns;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]

@@ -1,21 +1,21 @@
 <?php
 
-use Websyspro\Core\Enums\Module;
-use Websyspro\Core\Models\Decorations\Authorize;
-use Websyspro\Core\Models\Decorations\Columns\Varchar;
-use Websyspro\Core\Models\Decorations\Controller;
-use Websyspro\Core\Models\Decorations\FileValidate;
-use Websyspro\Core\Models\Decorations\Http\HttpDelete;
-use Websyspro\Core\Models\Decorations\Http\HttpGet;
-use Websyspro\Core\Models\Decorations\Http\HttpPost;
-use Websyspro\Core\Models\Decorations\Http\HttpPut;
-use Websyspro\Core\Models\Decorations\Model;
-use Websyspro\Core\Models\Decorations\Parametros\Body;
-use Websyspro\Core\Models\Decorations\Parametros\Files;
-use Websyspro\Core\Models\Decorations\Parametros\Param;
-use Websyspro\Core\Models\Decorations\Parametros\Query;
-use Websyspro\Core\Server\Application;
-use Websyspro\Core\Server\HttpError;
+use Websyspro\HttpRequest\Enums\Module;
+use Websyspro\HttpRequest\Models\Decorations\Authorize;
+use Websyspro\HttpRequest\Models\Decorations\Columns\Varchar;
+use Websyspro\HttpRequest\Models\Decorations\Controller;
+use Websyspro\HttpRequest\Models\Decorations\FileValidate;
+use Websyspro\HttpRequest\Models\Decorations\Http\HttpDelete;
+use Websyspro\HttpRequest\Models\Decorations\Http\HttpGet;
+use Websyspro\HttpRequest\Models\Decorations\Http\HttpPost;
+use Websyspro\HttpRequest\Models\Decorations\Http\HttpPut;
+use Websyspro\HttpRequest\Models\Decorations\Model;
+use Websyspro\HttpRequest\Models\Decorations\Parametros\Body;
+use Websyspro\HttpRequest\Models\Decorations\Parametros\Files;
+use Websyspro\HttpRequest\Models\Decorations\Parametros\Param;
+use Websyspro\HttpRequest\Models\Decorations\Parametros\Query;
+use Websyspro\HttpRequest\Server\Application;
+use Websyspro\HttpRequest\Server\HttpError;
 
 #[Model()]
 class UserModel {

@@ -1,12 +1,12 @@
 <?php
 
-namespace Websyspro\Core\Server;
+namespace Websyspro\HttpRequest\Server;
 
 use ReflectionAttribute;
-use Websyspro\Core\Common\Utils;
-use Websyspro\Core\Enums\Decoration;
-use Websyspro\Core\Enums\Method;
-use Websyspro\Core\Enums\MiddlewareStructure;
+use Websyspro\HttpRequest\Common\Utils;
+use Websyspro\HttpRequest\Enums\Decoration;
+use Websyspro\HttpRequest\Enums\Method;
+use Websyspro\HttpRequest\Enums\MiddlewareStructure;
 
 class RequestControllerItem
 {

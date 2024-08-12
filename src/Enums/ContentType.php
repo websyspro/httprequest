@@ -1,6 +1,6 @@
 <?php
 
-namespace Websyspro\Core\Enums;
+namespace Websyspro\HttpRequest\Enums;
 
 class ContentType {
   public const TextPlain = "text/plain";

@@ -1,6 +1,6 @@
 <?php
 
-namespace Websyspro\Core\Enums;
+namespace Websyspro\HttpRequest\Enums;
 
 class Decoration
 {

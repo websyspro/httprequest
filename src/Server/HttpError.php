@@ -1,9 +1,9 @@
 <?php
 
-namespace Websyspro\Core\Server;
+namespace Websyspro\HttpRequest\Server;
 
-use Websyspro\Core\Enums\HttpStatus;
-use Websyspro\Core\Enums\HttpTypeError;
+use Websyspro\HttpRequest\Enums\HttpStatus;
+use Websyspro\HttpRequest\Enums\HttpTypeError;
 
 class HttpError
 {

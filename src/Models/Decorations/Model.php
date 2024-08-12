@@ -1,6 +1,6 @@
 <?php
 
-namespace Websyspro\Core\Models\Decorations;
+namespace Websyspro\HttpRequest\Models\Decorations;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS)]

@@ -6,5 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Websyspro\\HttpRequest\\' => array($baseDir . '/src'),
+    'Websyspro\\Core\\' => array($baseDir . '/src'),
 );

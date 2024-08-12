@@ -1,13 +1,13 @@
 <?php
 
-namespace Websyspro\Core\Server;
-use Websyspro\Core\Common\Utils;
-use Websyspro\Core\Enums\ControllerStructure;
-use Websyspro\Core\Enums\HttpStatus;
-use Websyspro\Core\Enums\HttpType;
-use Websyspro\Core\Enums\MethodStructure;
-use Websyspro\Core\Enums\Module;
-use Websyspro\Core\Enums\ServerType;
+namespace Websyspro\HttpRequest\Server;
+use Websyspro\HttpRequest\Common\Utils;
+use Websyspro\HttpRequest\Enums\ControllerStructure;
+use Websyspro\HttpRequest\Enums\HttpStatus;
+use Websyspro\HttpRequest\Enums\HttpType;
+use Websyspro\HttpRequest\Enums\MethodStructure;
+use Websyspro\HttpRequest\Enums\Module;
+use Websyspro\HttpRequest\Enums\ServerType;
 
 class Application
 {

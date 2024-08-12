@@ -1,6 +1,6 @@
 <?php
 
-namespace Websyspro\Core\Server;
+namespace Websyspro\HttpRequest\Server;
 
 class RouterList
 {

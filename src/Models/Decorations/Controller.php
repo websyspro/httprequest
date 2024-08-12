@@ -1,8 +1,8 @@
 <?php
 
-namespace Websyspro\Core\Models\Decorations;
+namespace Websyspro\HttpRequest\Models\Decorations;
 
-use Websyspro\Core\Enums\Decoration;
+use Websyspro\HttpRequest\Enums\Decoration;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS)]

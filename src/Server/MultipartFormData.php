@@ -1,9 +1,9 @@
 <?php
 
-namespace Websyspro\Core\Server;
+namespace Websyspro\HttpRequest\Server;
 
-use Websyspro\Core\Common\Utils;
-use Websyspro\Core\Enums\MultipartFormDataAttrs;
+use Websyspro\HttpRequest\Common\Utils;
+use Websyspro\HttpRequest\Enums\MultipartFormDataAttrs;
 
 class MultipartFormData
 {
