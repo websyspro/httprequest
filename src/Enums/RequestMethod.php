@@ -2,12 +2,12 @@
 
 namespace Websyspro\Core\Enums;
 
-enum RequestMethod {
-  case POST;
-  case GET;
-  case PUT;
-  case PATCH;
-  case DELETE;
-  case HEAD;
-  case OPTIONS;
+class RequestMethod {
+  public const POST = "POST";
+  public const GET = "GET";
+  public const PUT = "PUT";
+  public const PATCH = "PATCH";
+  public const DELETE = "DELETE";
+  public const HEAD = "HEAD";
+  public const OPTIONS = "OPTIONS";
 }

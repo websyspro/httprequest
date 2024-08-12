@@ -31,6 +31,8 @@ class Application
   public function createApp(): void {
     $this->Request = Request::create();
     $this->Response = Response::create();
+
+    print_r($this->Request);
   }
 
   public function getModules(): array {
@@ -39,9 +41,9 @@ class Application
 
   public function createControllers(): void
   {
-    $this->controllerList = ControllerList::create(
-      $this->Request, $this->Response, $this->getModules()
-    );
+    // $this->controllerList = ControllerList::create(
+    //   $this->Request, $this->Response, $this->getModules()
+    // );
   }
 
   public function CreateControllersFilter(int $pathArr = 0): void
@@ -115,20 +117,20 @@ class Application
            );
 
           switch($ParamType){
-            case "int":
-              $this->Request->addParams(
-                $ParamString, (int)$RouteRequest[$Key]
-              );
-              break;
-            case "string":
-              $this->Request->addParams(
-                $ParamString, (string)$RouteRequest[$Key]
-              );
-              break;
-            default:
-              $this->Request->addParams(
-                $ParamString, (string)$RouteRequest[$Key]
-              );
+            // case "int":
+            //   $this->Request->addParams(
+            //     $ParamString, (int)$RouteRequest[$Key]
+            //   );
+            //   break;
+            // case "string":
+            //   $this->Request->addParams(
+            //     $ParamString, (string)$RouteRequest[$Key]
+            //   );
+            //   break;
+            // default:
+            //   $this->Request->addParams(
+            //     $ParamString, (string)$RouteRequest[$Key]
+            //   );
            }
          }
        });

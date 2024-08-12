@@ -26,7 +26,7 @@ class MultipartFormData
   public static function LoadPHPInput(): MultipartFormData
   {
     return new static(
-      MultipartFormDataAttrs::FormDataDefaultFile->value
+      MultipartFormDataAttrs::FormDataDefaultFile
     );
   }
 
@@ -48,7 +48,7 @@ class MultipartFormData
   private function ReadFileEof(
   ): bool {
     return preg_match_all(
-      MultipartFormDataAttrs::FormDataRegExpEndFormData->value,
+      MultipartFormDataAttrs::FormDataRegExpEndFormData,
       rtrim($this->lineBuffer)
     );
   }
@@ -62,7 +62,7 @@ class MultipartFormData
   private function ReadFileContentDisposition(
   ): bool {
     return preg_match_all(
-      MultipartFormDataAttrs::FormDataContentDisposition->value, 
+      MultipartFormDataAttrs::FormDataContentDisposition, 
       rtrim(
         $this->lineBuffer
       )
@@ -84,7 +84,7 @@ class MultipartFormData
   private function ReadFileContentType(
   ): bool {
     return preg_match_all(
-      MultipartFormDataAttrs::FormDataContentType->value, 
+      MultipartFormDataAttrs::FormDataContentType, 
       rtrim(
         $this->lineBuffer
       )
@@ -93,7 +93,7 @@ class MultipartFormData
 
   private function AddReadFileContentType(
   ): void {
-    $this->formDataContentType = MultipartFormDataAttrs::ApplicationOctetStream->value;
+    $this->formDataContentType = MultipartFormDataAttrs::ApplicationOctetStream;
   }
 
   private function GetFormDataContentType(
@@ -109,9 +109,9 @@ class MultipartFormData
 
   private function AddFormDataContentBody(
   ): void {
-    if ($this->GetFormDataContentType() === MultipartFormDataAttrs::ApplicationFormData->value){
+    if ($this->GetFormDataContentType() === MultipartFormDataAttrs::ApplicationFormData){
       $this->formDataContentBody[] = str_replace(
-        MultipartFormDataAttrs::FormDataEndBody->value, "", $this->lineBuffer
+        MultipartFormDataAttrs::FormDataEndBody, "", $this->lineBuffer
       );
     } else {
       $this->formDataContentBody[] = $this->lineBuffer;
@@ -133,13 +133,13 @@ class MultipartFormData
   private function ReadFileContentsClear(
   ): void {
     $this->formDataContentBody = [];
-    $this->formDataContentType = MultipartFormDataAttrs::ApplicationFormData->value;
+    $this->formDataContentType = MultipartFormDataAttrs::ApplicationFormData;
   }
 
   private function ReadFileBof(
   ): bool {
     return preg_match_all(
-      MultipartFormDataAttrs::FormDataRegExpStartFormData->value,
+      MultipartFormDataAttrs::FormDataRegExpStartFormData,
       rtrim($this->lineBuffer)
     );
   }
@@ -147,7 +147,7 @@ class MultipartFormData
   private function ReadFileStream(
   ): void {
     $this->formDataStream = fopen(
-      $this->formDataFile, MultipartFormDataAttrs::FormDataReadType->value
+      $this->formDataFile, MultipartFormDataAttrs::FormDataReadType
     );
   }
 
@@ -178,9 +178,9 @@ class MultipartFormData
         }
 
         $this->formDataList[$this->cursor] = [
-          MultipartFormDataAttrs::ContentDisposition->name => $this->GetReadFileContentDisposition(),
-          MultipartFormDataAttrs::ContentType->name => $this->GetFormDataContentType(),
-          MultipartFormDataAttrs::ContentBody->name => $this->GetFormDataContentBody()
+          MultipartFormDataAttrs::ContentDisposition => $this->GetReadFileContentDisposition(),
+          MultipartFormDataAttrs::ContentType => $this->GetFormDataContentType(),
+          MultipartFormDataAttrs::ContentBody => $this->GetFormDataContentBody()
         ]; 
       }
     }    
@@ -195,14 +195,14 @@ class MultipartFormData
   ): void {
     $this->formDataList = Utils::Map(
       $this->formDataList, function($formData){
-        if ($formData === MultipartFormDataAttrs::ApplicationFormData->value) {
+        if ($formData === MultipartFormDataAttrs::ApplicationFormData) {
           return $formData;
         }
 
         return array_merge(
           $formData, [
-            MultipartFormDataAttrs::ContentBody->name => implode(
-              "", $formData[MultipartFormDataAttrs::ContentBody->name]
+            MultipartFormDataAttrs::ContentBody => implode(
+              "", $formData[MultipartFormDataAttrs::ContentBody]
             )
           ]
         );
@@ -214,7 +214,7 @@ class MultipartFormData
     array $formData
   ): string {
     list( $fieldname ) = array_slice(
-      explode(";", $formData[MultipartFormDataAttrs::ContentDisposition->name]),
+      explode(";", $formData[MultipartFormDataAttrs::ContentDisposition]),
     1);
 
     list( $fieldname ) = array_slice(
@@ -230,7 +230,7 @@ class MultipartFormData
     array $formData
   ): string {
     list( $filename ) = array_slice(explode(
-      ";", $formData[MultipartFormDataAttrs::ContentDisposition->name]
+      ";", $formData[MultipartFormDataAttrs::ContentDisposition]
     ), 2);
 
     list( $filename ) = array_slice(
@@ -254,27 +254,27 @@ class MultipartFormData
   ): void {
     $this->formDataList = Utils::Map(
       $this->formDataList, function($formData){
-        if ($formData[MultipartFormDataAttrs::ContentType->name] === MultipartFormDataAttrs::ApplicationOctetStream->value) {
-          return [ MultipartFormDataAttrs::FormDataTypeFile->name => [
+        if ($formData[MultipartFormDataAttrs::ContentType] === MultipartFormDataAttrs::ApplicationOctetStream) {
+          return [ MultipartFormDataAttrs::FormDataTypeFile => [
               $this->GetFormDataKey($formData) => [
-                MultipartFormDataAttrs::FormDataFileName->name => $this->GetFormDataFilename($formData),
-                MultipartFormDataAttrs::FormDataFileSize->name => $this->GetFileSize($formData[
-                  MultipartFormDataAttrs::ContentBody->name
+                MultipartFormDataAttrs::FormDataFileName => $this->GetFormDataFilename($formData),
+                MultipartFormDataAttrs::FormDataFileSize => $this->GetFileSize($formData[
+                  MultipartFormDataAttrs::ContentBody
                 ]),
-                MultipartFormDataAttrs::FormDataFileType->name => pathinfo(
+                MultipartFormDataAttrs::FormDataFileType => pathinfo(
                   $this->GetFormDataFilename($formData), PATHINFO_EXTENSION
                 ),
-                MultipartFormDataAttrs::FormDataFileBody->name => base64_encode($formData[
-                  MultipartFormDataAttrs::ContentBody->name
+                MultipartFormDataAttrs::FormDataFileBody => base64_encode($formData[
+                  MultipartFormDataAttrs::ContentBody
                 ])
               ]
             ]
           ];
         } else
-        if ($formData[MultipartFormDataAttrs::ContentType->name] === MultipartFormDataAttrs::ApplicationFormData->value) {
-          return [ MultipartFormDataAttrs::FormDataTypeField->name => [
+        if ($formData[MultipartFormDataAttrs::ContentType] === MultipartFormDataAttrs::ApplicationFormData) {
+          return [ MultipartFormDataAttrs::FormDataTypeField => [
               $this->GetFormDataKey($formData) => $formData[
-                MultipartFormDataAttrs::ContentBody->name
+                MultipartFormDataAttrs::ContentBody
               ]
             ]
           ];
@@ -285,8 +285,8 @@ class MultipartFormData
 
   private function ReadFileDefinedGrpups(
     array $formDataListArr = [
-      MultipartFormDataAttrs::FormDataTypeField->name => [],
-      MultipartFormDataAttrs::FormDataTypeFile->name => []
+      MultipartFormDataAttrs::FormDataTypeField => [],
+      MultipartFormDataAttrs::FormDataTypeFile => []
     ]
   ): void
   {
@@ -302,14 +302,14 @@ class MultipartFormData
 
     $this->formDataList = [];
     $this->formDataList[] = [
-      MultipartFormDataAttrs::FormDataTypeField->name => $formDataListArr[
-        MultipartFormDataAttrs::FormDataTypeField->name
+      MultipartFormDataAttrs::FormDataTypeField => $formDataListArr[
+        MultipartFormDataAttrs::FormDataTypeField
       ]
     ];
 
     $this->formDataList[] = [
-      MultipartFormDataAttrs::FormDataTypeFile->name => $formDataListArr[
-        MultipartFormDataAttrs::FormDataTypeFile->name
+      MultipartFormDataAttrs::FormDataTypeFile => $formDataListArr[
+        MultipartFormDataAttrs::FormDataTypeFile
       ]
     ];
   }
@@ -322,20 +322,20 @@ class MultipartFormData
   private function ReadPost(): void
   {
     $this->formDataList[] = [
-      MultipartFormDataAttrs::FormDataTypeField->name => $_POST
+      MultipartFormDataAttrs::FormDataTypeField => $_POST
     ];
     $this->formDataList[] = [
-      MultipartFormDataAttrs::FormDataTypeFile->name => Utils::Map(
+      MultipartFormDataAttrs::FormDataTypeFile => Utils::Map(
         $_FILES, function($file){
           $file = (object)$file;
 
           return [
-            MultipartFormDataAttrs::FormDataFileName->name => $file->name,
-            MultipartFormDataAttrs::FormDataFileSize->name => $file->size,
-            MultipartFormDataAttrs::FormDataFileType->name => pathinfo(
+            MultipartFormDataAttrs::FormDataFileName => $file,
+            MultipartFormDataAttrs::FormDataFileSize => $file->size,
+            MultipartFormDataAttrs::FormDataFileType => pathinfo(
               $file->name, PATHINFO_EXTENSION
             ),
-            MultipartFormDataAttrs::FormDataFileBody->name => base64_encode(
+            MultipartFormDataAttrs::FormDataFileBody => base64_encode(
               file_get_contents($file->tmp_name)
             )
           ];
@@ -362,7 +362,7 @@ class MultipartFormData
         $formDataList
       );
 
-      if ($formDataListKey === MultipartFormDataAttrs::FormDataTypeField->name){
+      if ($formDataListKey === MultipartFormDataAttrs::FormDataTypeField){
         return FieldDataList::create(
           $formDataList[
             $formDataListKey
@@ -381,7 +381,7 @@ class MultipartFormData
         $formDataList
       );
 
-      if ($formDataListKey === MultipartFormDataAttrs::FormDataTypeFile->name){
+      if ($formDataListKey === MultipartFormDataAttrs::FormDataTypeFile){
         return FileDataList::create(
           $formDataList[
             $formDataListKey

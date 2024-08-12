@@ -2,9 +2,9 @@
 
 namespace Websyspro\Core\Enums;
 
-enum ContentType:string {
-  case TextPlain = "text/plain";
-  case ApplicationJson = "application/json";
-  case MultipartFormData = "multipart/form-data";
-  case XWwwFormUrlencoded = "application/x-www-form-urlencoded";
+class ContentType {
+  public const TextPlain = "text/plain";
+  public const  ApplicationJson = "application/json";
+  public const  MultipartFormData = "multipart/form-data";
+  public const  XWwwFormUrlencoded = "application/x-www-form-urlencoded";
 }
