@@ -1,7 +1,9 @@
 {
     "name": "websyspro/httprequest",
     "description": "Collection of components for frontend and backend",
-    "type": "project",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
             "Websyspro\\HttpRequest\\": "src/"
