@@ -15,7 +15,6 @@ use Websyspro\HttpRequest\Models\Decorations\Parametros\Files;
 use Websyspro\HttpRequest\Models\Decorations\Parametros\Param;
 use Websyspro\HttpRequest\Models\Decorations\Parametros\Query;
 use Websyspro\HttpRequest\Server\Application;
-use Websyspro\HttpRequest\Server\HttpError;
 
 #[Model()]
 class UserModel {
@@ -113,12 +112,11 @@ class ClientController
   }
 }
 
-Application::create([
-  Module::Controllers => [
+Application::create(
+  apiBase: "api/v1",
+  apiPort: "8080",
+  controllers: [
     UserController::class,
     ClientController::class
-  ],
-  Module::Models => [
-    UserModel::class
   ]
-]);
+);

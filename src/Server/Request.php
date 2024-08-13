@@ -110,7 +110,7 @@ class Request
    * @param: <none>
    * **/
   public function __construct(
-    private Application $application
+    public Application $application
   ){
     $this->setProperties();
     $this->setBodyArgs();
@@ -186,7 +186,7 @@ class Request
      * **/
     if (sizeof(explode("/", $this->requestUri)) >= 4) {
       [, $this->apiBase, $this->apiVersion, $this->controller ] = explode(
-        DIRECTORY_SEPARATOR_LINUX, $this->requestUri
+        "/", $this->requestUri
       );
 
       /**
@@ -198,7 +198,7 @@ class Request
         );
 
         $this->requestRouteUriLength = sizeof(explode(
-          DIRECTORY_SEPARATOR_LINUX, preg_replace( "/^\//", "", $this->requestRouteUri )
+          "/", preg_replace( "/^\//", "", $this->requestRouteUri )
         ));
       }
     } else {
@@ -329,8 +329,8 @@ class Request
      array $requestUriArr = [],
      array $routeUriPaths = [],
   ): bool {
-    $routeUriArr = explode(DIRECTORY_SEPARATOR_LINUX, $routeUri);
-    $requestUriArr = explode(DIRECTORY_SEPARATOR_LINUX, $this->requestUri);
+    $routeUriArr = explode( "/", $routeUri );
+    $requestUriArr = explode( "/", $this->requestUri );
 
     /**
      * Route not exactly exactly the same
@@ -370,8 +370,8 @@ class Request
      array $routeUriArr = [],
      array $requestUriArr = []
   ): void {
-    $routeUriArr = explode(DIRECTORY_SEPARATOR_LINUX, $routeUri);
-    $requestUriArr = explode(DIRECTORY_SEPARATOR_LINUX, $this->requestUri);
+    $routeUriArr = explode( "/", $routeUri );
+    $requestUriArr = explode( "/", $this->requestUri );
 
     /**
      * Route not exactly exactly the same
@@ -437,15 +437,16 @@ class Request
          * Create RequestController Object
          * **/
         $RquestController = RequestController::create(
-          controller: $controller
+          controller: $controller,
+          request: $this
         );
 
         /**
          * Popular list of controls within the request
          * **/
-        $this->controllerArr[ $RquestController->requestControllerItem->controllerName ] = RequestController::create(
-          controller: $controller
-        );
+        $this->controllerArr[
+          $RquestController->requestControllerItem->controllerName
+        ] = $RquestController;
       });
 
       /**
@@ -465,7 +466,7 @@ class Request
 
           return $requestControllerRouterItem->routeMethodType === $this->requestMethod && $this->requestRouteUriLength === (
             empty( preg_replace( "/^\//", "", $route )) ? 0 : sizeof(
-              explode(DIRECTORY_SEPARATOR_LINUX, preg_replace( "/^\//", "", $route ))
+              explode( "/", preg_replace( "/^\//", "", $route ))
             )) && $this->isControllerRouteValid($requestControllerRouterItem->routeUri);
         });
 

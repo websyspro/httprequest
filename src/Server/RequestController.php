@@ -14,9 +14,11 @@ class RequestController
   public RequestControllerItem $requestControllerItem;
 
   public function __construct(
-    private string $controller
+    private string $controller,
+    private Request $request
   ){
     $this->requestControllerItem = RequestControllerItem::create(
+      request: $this->request,
       controller: $this->getController($this->controller),
       controllerUrl: $this->getControllerUrl($this->controller),
       controllerName: $this->getControllerName($this->controller),
@@ -29,17 +31,16 @@ class RequestController
     string $controller
   ): string {
     return sprintf(
-      "%s{$controller}", DIRECTORY_SEPARATOR_WINDOWS
+      "%s{$controller}", "\\"
     );
   }
 
   private function getControllerUrl(
     string $controller
   ): string {
-    return implode(
-      ServerUtils::GetApiBarSep(), [
-      ServerUtils::GetApiBase(),
-      ServerUtils::GetController(
+    return implode( "/", [
+      $this->request->application->apiBase,
+      $this->GetController(
         $controller
       )
     ]);    
@@ -70,7 +71,7 @@ class RequestController
 
     $parametersFromContruct = Utils::Map($parametersFromContruct,
       fn($parameters) => Utils::Map($parameters, 
-        fn($parameter) => DIRECTORY_SEPARATOR_WINDOWS . $parameter->getType()->getName()
+        fn($parameter) => "\\" . $parameter->getType()->getName()
       )
     );
 
@@ -92,7 +93,7 @@ class RequestController
     );
 
     return Utils::Map($MiddlewareFromController, fn($attribute) => [
-      MiddlewareStructure::InstanceClass => DIRECTORY_SEPARATOR_WINDOWS . $attribute->getName(),
+      MiddlewareStructure::InstanceClass => "\\" . $attribute->getName(),
       MiddlewareStructure::ArgsClass => $attribute->getArguments()
     ]);
   }   
@@ -104,10 +105,12 @@ class RequestController
    * @param string $controller
    * **/
   public static function create(
-    string $controller
+    string $controller,
+    Request $request
   ): RequestController {
     return new static(
-      $controller
+      controller: $controller,
+      request: $request
     );
   }
 }

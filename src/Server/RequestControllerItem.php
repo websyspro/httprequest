@@ -13,6 +13,7 @@ class RequestControllerItem
   public RouterList $routerList;
 
   public function __construct(
+    public Request $request,
     public string $controller,
     public string $controllerUrl,
     public string $controllerName,
@@ -22,10 +23,9 @@ class RequestControllerItem
     $this->routeList();
   }
 
-  private function routeList(): void
-  {
-    if($this->routerList = RouterList::create())
-    {
+  private function routeList(
+  ): void {
+    if($this->routerList = RouterList::create()){
       $methodsInController = Utils::Filter(
         get_class_methods($this->controller), fn(string $method) => (
           $method !== Method::Contruct
@@ -56,8 +56,9 @@ class RequestControllerItem
     );
   }
 
-  private function getRoute(string $method): string 
-  {
+  private function getRoute(
+    string $method
+  ): string {
     $routeFromMethods = Utils::Filter(
       $this->getAttributesFromMethods($method), fn(ReflectionAttribute $Attribute) => (
         $Attribute->getName()::TypeDecoration === Decoration::Route
@@ -79,12 +80,11 @@ class RequestControllerItem
   private function getRouteUrl(
     string $method    
   ): string {
-    return implode(
-      ServerUtils::GetApiBarSep(), [
-      ServerUtils::GetApiBase(), 
-      ServerUtils::GetController($this->controller),
-      ServerUtils::GetRoute(
-        $this->controller, $method
+    return implode( "/", [
+      $this->getApiBase(),
+      $this->getController(),
+      $this->getRoute(
+        $method
       )
     ]);
   }
@@ -158,9 +158,32 @@ class RequestControllerItem
         MiddlewareStructure::ArgsClass => $attribute->getArguments()
       ]
     );
-  }  
+  }
+  
+  public function getController(
+  ): string {
+    $AttributeFromController = Utils::Filter(Reflect::getAttributesFromReflectClass($this->controller), 
+      fn(ReflectionAttribute $controller) => (
+        $controller->getName()::TypeDecoration === Decoration::Controller
+      )
+    );
+
+    $ApiController = Utils::Map($AttributeFromController, 
+      fn($api) => Utils::ArrayFirtsValue($api->getArguments())
+    );
+
+    return Utils::ArrayFirtsValue(
+      $ApiController
+    );
+  } 
+  
+  public function getApiBase(
+  ): string {
+    return "/{$this->request->application->apiBase}";
+  }
 
   public static function create(
+    Request $request,
     string $controller,
     string $controllerUrl,
     string $controllerName,
@@ -168,6 +191,7 @@ class RequestControllerItem
      array $controllerMiddlewares
   ): RequestControllerItem {
     return new static(
+      request: $request,
       controller: $controller,
       controllerUrl: $controllerUrl,
       controllerName: $controllerName,
