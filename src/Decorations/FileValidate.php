@@ -15,7 +15,8 @@ class FileValidate {
   public const TypeDecoration = Decoration::Middleware;
 
   public function __construct(
-    private string $filename
+    private array $extensions = [],
+    private int $fiesize = 0
   ){}
 
   public function Execute(

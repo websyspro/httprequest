@@ -52,6 +52,17 @@ class UserController
 
   #[Authorize()]  
   #[HttpPut(":email")]
+  function updateUserEmailTest(
+    #[Body()] array $body,
+    #[Query()] array $query,
+    #[Files()] array $files,
+    #[Param()] array $param
+  ): mixed {
+    return $files;
+  }  
+
+  #[Authorize()]  
+  #[HttpPost(":email")]
   function updateUserEmail(
     #[Body()] array $body,
     #[Query()] array $query,
