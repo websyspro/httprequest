@@ -48,9 +48,10 @@ class RequestController {
   private function getControllerName(
     string $controller
   ): string {
+    [ , , , $controllerBase ] = explode("\\", $controller);
     return preg_replace(
       "/controller$/", "", mb_strtolower(
-        $controller
+        $controllerBase
       )
     );
   }

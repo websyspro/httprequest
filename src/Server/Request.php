@@ -251,7 +251,9 @@ class Request
           return $requestControllerRouterItem->routeMethodType === $this->requestMethod && $this->requestRouteUriLength === (
             empty( preg_replace( "/^\//", "", $route )) ? 0 : sizeof(
               explode( "/", preg_replace( "/^\//", "", $route ))
-            )) && $this->isControllerRouteValid($requestControllerRouterItem->routeUri);
+            )) && $this->isControllerRouteValid(
+              preg_replace("/\/$/", "", $requestControllerRouterItem->routeUri)
+            );
         });
 
         if (sizeof($preFiltersRouters) === 0){

@@ -47,7 +47,7 @@ class UserController
   #[HttpGet()]
   function getAll(
   ): array {
-    return [];
+    return ["test"];
   }
 
   #[Authorize()]  
