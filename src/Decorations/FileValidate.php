@@ -2,10 +2,10 @@
 
 namespace Websyspro\HttpRequest\Decorations;
 
+use Attribute;
 use Websyspro\HttpRequest\Enums\Decoration;
 use Websyspro\HttpRequest\Server\Request;
 use Websyspro\HttpRequest\Server\Response;
-use Attribute;
 use Websyspro\HttpRequest\Enums\HttpStatus;
 
 #[Attribute(
