@@ -6,7 +6,6 @@ use Attribute;
 use Websyspro\HttpRequest\Enums\Decoration;
 use Websyspro\HttpRequest\Server\Request;
 use Websyspro\HttpRequest\Server\Response;
-use Websyspro\HttpRequest\Enums\HttpStatus;
 
 #[Attribute(
   Attribute::TARGET_CLASS |
