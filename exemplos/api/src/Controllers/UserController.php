@@ -4,6 +4,7 @@ namespace Wsp\Api\Controllers;
 
 use Websyspro\HttpRequest\Decorations\Authorize;
 use Websyspro\HttpRequest\Decorations\Controller;
+use Websyspro\HttpRequest\Decorations\FileValidate;
 use Websyspro\HttpRequest\Decorations\Http\HttpDelete;
 use Websyspro\HttpRequest\Decorations\Http\HttpGet;
 use Websyspro\HttpRequest\Decorations\Http\HttpPost;
@@ -50,7 +51,11 @@ class UserController
     return ["test"];
   }
 
-  #[Authorize()]  
+  #[Authorize()]
+  #[FileValidate(
+    extensions: [ "pdf" ],
+    fiesize: 1000
+  )]  
   #[HttpPut(":email")]
   function updateUserEmailTest(
     #[Body()] array $body,

@@ -16,7 +16,7 @@ class FileValidate {
 
   public function __construct(
     private array $extensions = [],
-    private int $fiesize = 0
+    private int $filesize = 0
   ){}
 
   public function Execute(
