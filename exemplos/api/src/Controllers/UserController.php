@@ -55,9 +55,10 @@ class UserController
   function updateUserEmail(
     #[Body()] array $body,
     #[Query()] array $query,
-    #[Files()] array $files
+    #[Files()] array $files,
+    #[Param()] array $param
   ): mixed {
-    return $body;
+    return $files;
   }
 
   #[Authorize()]

@@ -245,9 +245,7 @@ class MultipartFormData
   private function GetFileSize(
     string $formDataFile
   ): float {
-    return (float)bcdiv(
-      strlen($formDataFile), 1000, 3
-    );
+    return (float)strlen($formDataFile);
   }
 
   private function ReadFileDefinedExtract(
