@@ -1,0 +1,19 @@
+{
+    "name": "wsp/api",
+    "description": "Realizar teste utiliando o HttpRequest componentes",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Wsp\\Api\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "e.thiago-pla",
+            "email": "e.thiago-pla@platos.parceirosedu.com.br"
+        }
+    ],
+    "require": {
+        "websyspro/httprequest": "dev-master"
+    }
+}

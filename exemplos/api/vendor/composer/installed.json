@@ -1,0 +1,47 @@
+{
+    "packages": [
+        {
+            "name": "websyspro/httprequest",
+            "version": "dev-master",
+            "version_normalized": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/websyspro/httprequest.git",
+                "reference": "fa6b5019046f429a3c45e3754e2e61a826e42c3b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/websyspro/httprequest/zipball/fa6b5019046f429a3c45e3754e2e61a826e42c3b",
+                "reference": "fa6b5019046f429a3c45e3754e2e61a826e42c3b",
+                "shasum": ""
+            },
+            "time": "2024-08-14T17:54:17+00:00",
+            "default-branch": true,
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Websyspro\\HttpRequest\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "websyspro",
+                    "email": "cpd.emersontsa@gmail.com"
+                }
+            ],
+            "description": "Collection of components for frontend and backend",
+            "support": {
+                "issues": "https://github.com/websyspro/httprequest/issues",
+                "source": "https://github.com/websyspro/httprequest/tree/master"
+            },
+            "install-path": "../websyspro/httprequest"
+        }
+    ],
+    "dev": true,
+    "dev-package-names": []
+}
