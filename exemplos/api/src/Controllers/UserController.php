@@ -53,8 +53,8 @@ class UserController
 
   #[Authorize()]
   #[FileValidate(
-    extensions: [ "pdf" ],
-    fiesize: 1000
+    extensions: ["pdf", "mp4"],
+    filesize: 1024
   )]  
   #[HttpPut(":email")]
   function updateUserEmailTest(
