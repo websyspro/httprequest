@@ -17,13 +17,14 @@ class Application
     $this->createControllers();
   }
 
-  public function createApp(): void {
+  public function createApp(
+  ): void {
     $this->request = Request::create($this);
     $this->response = Response::create($this);
   }
 
-  public function createControllers(): void
-  {
+  public function createControllers(
+  ): void {
     $this->request->setControllers(
       $this->controllers
     );

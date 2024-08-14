@@ -1,6 +1,6 @@
 <?php
 
-namespace Websyspro\HttpRequest\Models\Decorations;
+namespace Websyspro\HttpRequest\Decorations;
 
 use Websyspro\HttpRequest\Enums\Decoration;
 use Attribute;

@@ -9,8 +9,7 @@ use Websyspro\HttpRequest\Enums\Decoration;
 use Websyspro\HttpRequest\Enums\Method;
 use Websyspro\HttpRequest\Enums\MiddlewareStructure;
 
-class RequestController
-{
+class RequestController {
   public RequestControllerItem $requestControllerItem;
 
   public function __construct(
@@ -98,12 +97,6 @@ class RequestController
     ]);
   }   
 
-  /**
-   * @Create
-   * 
-   * Create controller instance
-   * @param string $controller
-   * **/
   public static function create(
     string $controller,
     Request $request

@@ -1,6 +1,6 @@
 <?php
 
-namespace Websyspro\HttpRequest\Models\Decorations;
+namespace Websyspro\HttpRequest\Decorations;
 
 use Websyspro\HttpRequest\Enums\Decoration;
 use Websyspro\HttpRequest\Server\Request;
@@ -12,18 +12,17 @@ use Websyspro\HttpRequest\Enums\HttpStatus;
   Attribute::TARGET_CLASS |
   Attribute::TARGET_METHOD
 )]
-class FileValidate
+class Authorize
 {
   public const TypeDecoration = Decoration::Middleware;
 
   public function __construct(
-    private string $filename
   ){}
 
   public function Execute(
     Request $request,
     Response $response
   ): void {
-    // $response->Error("Middleware Authorize -> {$this->filename}", HttpStatus::BadRequest);
+    //$response->Error("Middleware Authorize not", HttpStatus::BadRequest);
   }
 }

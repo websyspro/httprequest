@@ -1,6 +1,6 @@
 <?php
 
-namespace Websyspro\HttpRequest\Models\Decorations\Http;
+namespace Websyspro\HttpRequest\Decorations\Http;
 
 use Websyspro\HttpRequest\Enums\Decoration;
 use Websyspro\HttpRequest\Enums\HttpType;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Websyspro\HttpRequest\Models\Decorations\Parametros;
+namespace Websyspro\HttpRequest\Decorations\Parametros;
 
 use Websyspro\HttpRequest\Enums\Decoration;
 use Websyspro\HttpRequest\Server\Request;
@@ -8,7 +8,7 @@ use Websyspro\HttpRequest\Server\Response;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-class Query
+class Param
 {
   public const TypeDecoration = Decoration::RouteParameters;
 
@@ -19,8 +19,8 @@ class Query
     Request $request,
     Response $response
   ): array {
-    if(isset($request->requestQuerys)){
-      return $request->requestQuerys;
+    if(isset($request->requestParams)){
+      return $request->requestParams;
     } else return [];
   }  
 }

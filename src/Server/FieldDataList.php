@@ -2,14 +2,16 @@
 
 namespace Websyspro\HttpRequest\Server;
 
-class FieldDataList
-{
+class FieldDataList {
   public function __construct(
     public mixed $dataList = []
   ){}
 
-  public static function create(mixed $fieldList = []): FieldDataList
-  {
-    return new static($fieldList);
+  public static function create(
+    mixed $fieldList = []
+  ): FieldDataList {
+    return new static(
+      dataList: $fieldList
+    );
   }
 }

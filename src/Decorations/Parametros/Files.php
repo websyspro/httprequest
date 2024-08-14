@@ -1,6 +1,6 @@
 <?php
 
-namespace Websyspro\HttpRequest\Models\Decorations\Parametros;
+namespace Websyspro\HttpRequest\Decorations\Parametros;
 
 use Websyspro\HttpRequest\Enums\Decoration;
 use Websyspro\HttpRequest\Server\Request;

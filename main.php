@@ -1,19 +1,18 @@
 <?php
 
-use Websyspro\HttpRequest\Enums\Module;
-use Websyspro\HttpRequest\Models\Decorations\Authorize;
-use Websyspro\HttpRequest\Models\Decorations\Columns\Varchar;
-use Websyspro\HttpRequest\Models\Decorations\Controller;
-use Websyspro\HttpRequest\Models\Decorations\FileValidate;
-use Websyspro\HttpRequest\Models\Decorations\Http\HttpDelete;
-use Websyspro\HttpRequest\Models\Decorations\Http\HttpGet;
-use Websyspro\HttpRequest\Models\Decorations\Http\HttpPost;
-use Websyspro\HttpRequest\Models\Decorations\Http\HttpPut;
-use Websyspro\HttpRequest\Models\Decorations\Model;
-use Websyspro\HttpRequest\Models\Decorations\Parametros\Body;
-use Websyspro\HttpRequest\Models\Decorations\Parametros\Files;
-use Websyspro\HttpRequest\Models\Decorations\Parametros\Param;
-use Websyspro\HttpRequest\Models\Decorations\Parametros\Query;
+use Websyspro\HttpRequest\Decorations\Authorize;
+use Websyspro\HttpRequest\Decorations\Columns\Varchar;
+use Websyspro\HttpRequest\Decorations\Controller;
+use Websyspro\HttpRequest\Decorations\FileValidate;
+use Websyspro\HttpRequest\Decorations\Http\HttpDelete;
+use Websyspro\HttpRequest\Decorations\Http\HttpGet;
+use Websyspro\HttpRequest\Decorations\Http\HttpPost;
+use Websyspro\HttpRequest\Decorations\Http\HttpPut;
+use Websyspro\HttpRequest\Decorations\Model;
+use Websyspro\HttpRequest\Decorations\Parametros\Body;
+use Websyspro\HttpRequest\Decorations\Parametros\Files;
+use Websyspro\HttpRequest\Decorations\Parametros\Param;
+use Websyspro\HttpRequest\Decorations\Parametros\Query;
 use Websyspro\HttpRequest\Server\Application;
 
 #[Model()]
@@ -115,6 +114,7 @@ class ClientController
 Application::create(
   apiBase: "api/v1",
   apiPort: "8080",
+  modules: [],
   controllers: [
     UserController::class,
     ClientController::class
