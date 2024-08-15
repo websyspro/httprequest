@@ -7,6 +7,9 @@ class Application
   public Request $request;
   public Response $response;
 
+  public static $defaultApiBase = "api/v1";
+  public static $defaultApiPort = "80";
+
   public function __construct(
     public string $apiBase =  "api/v1",
     public string $apiPort = "8080",
