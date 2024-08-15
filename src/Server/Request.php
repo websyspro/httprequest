@@ -297,6 +297,10 @@ class Request
           }
         }
       }
+    } else {
+      $this->application->response->Send(
+        "Server started successfully"
+      );
     }
   }
 }
