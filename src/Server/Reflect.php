@@ -23,6 +23,14 @@ class Reflect
     )->getAttributes();
   }
 
+  public static function getPropertiesFromReflectClass(
+    string $Controller
+  ): array {
+    return static::getReflectClass(
+      $Controller
+    )->getProperties();
+  }  
+
   public static function getReflectMethod(
     string $reflectClass,
     string $reflectMethod
