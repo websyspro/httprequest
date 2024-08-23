@@ -3,6 +3,7 @@
 namespace Websyspro\HttpRequest\Server;
 
 use ReflectionAttribute;
+use ReflectionParameter;
 use Websyspro\HttpRequest\Common\Utils;
 use Websyspro\HttpRequest\Enums\Decoration;
 use Websyspro\HttpRequest\Enums\Method;
@@ -41,6 +42,7 @@ class RequestControllerItem
               routeName: $this->getRouteName($method),
               routeMethodType: $this->getRouteType($method),
               routeParameters: $this->getRouteParameters($method),
+              routeParametersArgs: $this->getRouteParametersArgs($method),
               routeMiddleware: $this->getRouteMiddleware($method),
             )
           )
@@ -138,6 +140,22 @@ class RequestControllerItem
 
     return $AttributesFromParametersFromMethod;
   } 
+
+  private function getRouteParametersArgs(
+    string $Method
+  ): array {
+    $methodFromClass = Reflect::getReflectClass(
+      $this->controller
+    )->getMethod($Method);
+
+    $test = Utils::Map($methodFromClass->getParameters(), fn(ReflectionParameter $parmeter) => (
+      Utils::Map($parmeter->getAttributes(), 
+        fn($attributes) => $attributes->getArguments()
+      )[0]
+    ));
+
+    return $test;
+  }
   
   private function getRouteMiddleware(
     string $method

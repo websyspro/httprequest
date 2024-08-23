@@ -2,11 +2,16 @@
 
 namespace Websyspro\HttpRequest\Server;
 
+use ReflectionAttribute;
 use ReflectionClass;
+use ReflectionMethod;
+use ReflectionParameter;
+use ReflectionProperty;
 use Websyspro\HttpRequest\Common\Utils;
 use Websyspro\HttpRequest\Enums\ConstructStructure;
 use Websyspro\HttpRequest\Enums\ContentType;
 use Websyspro\HttpRequest\Enums\HttpStatus;
+use Websyspro\HttpRequest\Enums\Method;
 use Websyspro\HttpRequest\Enums\MiddlewareStructure;
 use Websyspro\HttpRequest\Enums\MultipartFormDataAttrs;
 use Websyspro\HttpRequest\Enums\RequestMethod;
@@ -281,12 +286,14 @@ class Request
 
             $resultControllerMethod = call_user_func_array([
               $controllerClass, $requestControllerRouterItem->routeName
-            ], Utils::Map($requestControllerRouterItem->routeParameters, fn($parameter) => (
-              (new $parameter())->Execute(
-                $this->application->request,
-                $this->application->response
-              )
-            )));
+            ], Utils::MapKey($requestControllerRouterItem->routeParameters, fn($parameter, $index) =>
+                (call_user_func_array([
+                  new ReflectionClass($parameter), ConstructStructure::MethodNewInstance
+                ], $requestControllerRouterItem->routeParametersArgs[$index]))->Execute(
+                  $this->application->request,
+                  $this->application->response
+                )
+            ));
 
             if ($resultControllerMethod instanceof HttpError){
               $this->application->response->Error(

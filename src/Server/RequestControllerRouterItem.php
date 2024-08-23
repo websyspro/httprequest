@@ -9,8 +9,9 @@ class RequestControllerRouterItem
     public string $routeUri,
     public string $routeName,
     public string $routeMethodType,
-    public  array $routeParameters,
-    public  array $routeMiddleware
+    public array $routeParameters,
+    public array $routeParametersArgs,
+    public array $routeMiddleware
   ){}
 
   public static function create(
@@ -19,6 +20,7 @@ class RequestControllerRouterItem
     string $routeName,
     string $routeMethodType,
      array $routeParameters,
+     array $routeParametersArgs,
      array $routeMiddleware
   ): RequestControllerRouterItem {
     return new static(
@@ -27,6 +29,7 @@ class RequestControllerRouterItem
       routeName: $routeName,
       routeMethodType: $routeMethodType,
       routeParameters: $routeParameters,
+      routeParametersArgs: $routeParametersArgs,
       routeMiddleware: $routeMiddleware
     );
   } 
