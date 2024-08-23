@@ -14,7 +14,7 @@ class Application
     public string $apiBase =  "api/v1",
     public string $apiPort = "8080",
     public array $controllers = [],
-    public array $modules = []
+    public array $entitys = []
   ) {
     $this->createApp();
     $this->createControllers();
@@ -37,13 +37,13 @@ class Application
     string $apiBase =  "api/v1",
     string $apiPort = "8080",
      array $controllers = [],
-     array $modules = []
+     array $entitys = []
   ): Application {
     return new static(
       apiBase: $apiBase,
       apiPort: $apiPort,
       controllers: $controllers,
-      modules: $modules
+      entitys: $entitys
     );
   }  
 }
