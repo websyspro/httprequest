@@ -245,7 +245,11 @@ class Request
           RequestControllerRouterItem $requestControllerRouterItem
         ): bool {
           [ , $route ] = explode(
-            $this->controller, $requestControllerRouterItem->routeUri
+            sprintf( "%s/%s/%s", 
+              $this->apiBase, 
+              $this->apiVersion,
+              $this->controller
+            ), $requestControllerRouterItem->routeUri
           );
 
           return $requestControllerRouterItem->routeMethodType === $this->requestMethod && $this->requestRouteUriLength === (
@@ -258,7 +262,7 @@ class Request
 
         if (sizeof($preFiltersRouters) === 0){
           $this->application->response->Error(
-            "Cannot {$this->requestMethod} {$this->requestUriFull}", HttpStatus::NotFound
+            "Cannot route {$this->requestMethod} {$this->requestUriFull}", HttpStatus::NotFound
           );
         } else {
           $this->executeMiddleware(
