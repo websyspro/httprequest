@@ -13,14 +13,17 @@ class Param
   public const TypeDecoration = Decoration::RouteParameters;
 
   public function __construct(
+    private string $paramKey = ""
   ){}
 
   public function Execute(
     Request $request,
     Response $response
-  ): array {
+  ): array | string {
     if(isset($request->requestParams)){
-      return $request->requestParams;
+      if(empty($this->paramKey)){
+        return $request->requestParams;  
+      } else return $request->requestParams[$this->paramKey];
     } else return [];
   }  
 }
