@@ -552,7 +552,13 @@ class Migrations
   public function ExecuteScriptAll(
   ): void {
     if (sizeof($this->scriptArr)) {
-      DB::query( commandSql: $this->scriptArr );
+      $command = DB::query(
+        commandSql: $this->scriptArr
+      );
+
+      if ($command->hasError()) {
+        print $command->getError();
+      }
     }
   }
 
