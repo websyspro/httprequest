@@ -10,6 +10,7 @@ use Websyspro\HttpRequest\Server\Drivers\DB;
 
 class Migrations
 {
+  private array $logsErr = [];
   public array $entitysArr = [];
   public array $entitysPersisteds = [];
   public array $entitysCreateds = [];
@@ -552,13 +553,21 @@ class Migrations
   public function ExecuteScriptAll(
   ): void {
     if (sizeof($this->scriptArr)) {
-      $command = DB::query(
-        commandSql: $this->scriptArr
-      );
+      Utils::Map($this->scriptArr, function(string $script){
+        $command = DB::query(
+          commandSql: $script
+        );
 
-      if ($command->hasError()) {
-        print $command->getError();
-      }
+        if ($command->hasError()) {
+          $this->logsErr[] = $command->getError();
+        }
+      });
+
+      file_put_contents(
+        "logs.error", implode(
+          PHP_EOL, $this->logsErr
+        )
+      );
     }
   }
 
