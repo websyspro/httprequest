@@ -563,13 +563,11 @@ class Migrations
         }
       });
 
-      if (sizeof($this->logsErr)) {
-        file_put_contents(
-          "logs.error", implode(
-            PHP_EOL, $this->logsErr
-          )
-        );
-      }
+      file_put_contents(
+        "logs.error", implode(
+          PHP_EOL, $this->logsErr
+        )
+      );
     }
   }
 
