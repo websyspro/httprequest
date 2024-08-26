@@ -366,9 +366,11 @@ class Migrations
           $type, ["type", "autoinc", "required"]
         ), ARRAY_FILTER_USE_KEY );
   
-        if (isset($this->entitysPersisteds[$entity][$property]) && $property !== "Id" ) {
-          if ($hasChangeAttributes !== $this->entitysPersisteds[$entity][$property]) {
-            $this->entitysUpdates[$entity][$property] = $hasChangeAttributes;
+        if ( isset($this->entitysPersisteds[$entity])) {
+          if (isset($this->entitysPersisteds[$entity][$property]) && $property !== "Id" ) {
+            if ($hasChangeAttributes !== $this->entitysPersisteds[$entity][$property]) {
+              $this->entitysUpdates[$entity][$property] = $hasChangeAttributes;
+            }
           }
         }
       })
@@ -383,8 +385,10 @@ class Migrations
 
     Utils::MapKey( $this->entitysArr, fn( array $properties, string $entity) => (
       Utils::MapKey( $properties, function( array $attributes, string $property) use( $entity ) {
-        if ( isset($this->entitysPersisteds[$entity][$property]) === false ) {
-          $this->entitysInserts[$entity][$property] = $attributes;
+        if ( isset($this->entitysPersisteds[$entity])) {
+          if ( isset($this->entitysPersisteds[$entity][$property]) === false ) {
+            $this->entitysInserts[$entity][$property] = $attributes;
+          }
         }
       })
     ));
