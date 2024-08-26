@@ -4,6 +4,12 @@ namespace Websyspro\HttpRequest\Common;
 
 class Utils
 {
+  public static function Join(
+    array $arr = []
+  ): string {
+    return implode( ",", $arr );
+  }
+
   public static function ArrayFirtsValue(
     mixed $iterable
   ): string | Array | null {
@@ -54,5 +60,11 @@ class Utils
     }
 
     return $iterableArr;
+  }
+
+  public static function Str(
+    string $strTexto
+  ): string {
+    return $strTexto;
   }
 }

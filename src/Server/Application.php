@@ -10,23 +10,26 @@ class Application
   public static string $defaultApiBase = "api/v1";
   public static string $defaultApiPort = "80";
 
-  public static array $database = [
-    "host" => "localhost",
-    "user" => "root",
-    "pass" => "12345678",
-    "name" => "dataapi",
-    "port" => "3307"
-  ];
+  public static array $config = [];
 
   public function __construct(
     public string $apiBase =  "api/v1",
     public string $apiPort = "8080",
+    public array $database = [],
     public array $controllers = [],
     public array $entitys = []
   ) {
+    $this->createConfig();
     $this->createApp();
     $this->createEntitys();
     $this->createControllers();
+  }
+
+  public function createConfig(
+  ): void {
+    Application::$config = [
+      "database" => $this->database
+    ];
   }
 
   public function hasControllersList(
@@ -70,12 +73,14 @@ class Application
   public static function create(
     string $apiBase =  "api/v1",
     string $apiPort = "8080",
+     array $database = [],
      array $controllers = [],
      array $entitys = []
   ): Application {
     return new static(
       apiBase: $apiBase,
       apiPort: $apiPort,
+      database: $database,
       controllers: $controllers,
       entitys: $entitys
     );

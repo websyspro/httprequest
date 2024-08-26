@@ -17,6 +17,11 @@ class Migrations
   public array $entitysInserts = [];
   public array $entitysDrops = [];
   public array $entitysCreatedsIndexes = [];
+  
+  private array $persistedIndexes = [];
+  private array $persistedUniques = [];
+  private array $persistedForeigns = [];
+  
   public array $entitysCreatedsUniques = [];
   public array $entitysCreatedsForeigns = [];
   public array $scriptArr = [];
@@ -38,9 +43,7 @@ class Migrations
       [ , $cmd ] = $argv;
 
       if (empty($cmd) === false) {
-        [ $cmdStr, $cmdType ] = explode( "=", $cmd );
-
-        if ($cmdStr === "migrations" && $cmdType === "yes") {
+        if ( $cmd === "migrate" ) {
           return true;
         } else return false;
       } else return false;
@@ -57,7 +60,12 @@ class Migrations
 
   public function initMigrations(
   ): void {
-    $this->createEntityPersisteds();
+    $this->ObterPersistedsEntitys();
+    $this->ObterPersistedsIndexes();
+    $this->ObterPersistedsUniques();
+    $this->ObterPersistedsForeigns();
+
+
     $this->createEntityStructure();
     $this->createEntityStringSQL();
     $this->createEntityIndexeds();
@@ -70,42 +78,92 @@ class Migrations
     $this->createScripts();
   }
 
-  public function createEntityPersisteds(
-  ): void {
-    $entityPersisteds = DB::query(
-      commandSql: sprintf(
-        "select information_schema.columns.table_name as entity
-               ,information_schema.columns.column_name as name
-               ,information_schema.columns.column_type as type
-               ,if(information_schema.columns.is_nullable = 'NO', 'sim', 'não' ) as required
-               ,if(information_schema.columns.extra = 'auto_increment', 'sim', 'não' ) as autoinc
-			     from information_schema.columns
-			    where information_schema.columns.table_schema = '%s'
-		   order by information_schema.columns.table_name asc
-		           ,information_schema.columns.ordinal_position asc", Application::$database["name"]
-      )
+  private function ObterDatabase(): string {
+    return Application::$config["database"]["name"];
+  }
+
+  private function ObterPersistedsEntitysInDatabase(
+  ): string {
+    return Utils::Str(
+      "select information_schema.columns.table_name as entity
+              ,information_schema.columns.column_name as name
+              ,information_schema.columns.column_type as type
+              ,if(information_schema.columns.is_nullable = 'NO', 'sim', 'não' ) as required
+              ,if(information_schema.columns.extra = 'auto_increment', 'sim', 'não' ) as autoinc
+			    from information_schema.columns
+			   where information_schema.columns.table_schema = '{$this->ObterDatabase()}'
+		  order by information_schema.columns.table_name asc
+		          ,information_schema.columns.ordinal_position asc"
     );
+  }
 
-    Utils::Map( $entityPersisteds->rows(), function(array $persisted){
-      [ "required" => $required,
-        "autoinc" => $autoinc,
-        "entity" => $entity,
-        "name" => $name,
-        "type" => $type,
-      ] = $persisted;
+  private function DefinePersistedsEntitys(
+    array $EntitysArr = []
+  ): void {
+    [ $entity, $name, $type, $required, $autoinc ] = array_values($EntitysArr);
+    
+    $this->entitysPersisteds[$entity][$name] = array_merge(
+      [ "type" => $type ], $autoinc === "sim" ? [ "autoinc" => "sim" ] : [], $required === "sim" ? [ "required" => "sim" ] : [],
+    );    
+  }
 
-      $autoincArr = $autoinc === "sim"
-        ? [ "autoinc" => "sim" ]
-        : [];
+  public function ObterPersistedsEntitys(
+  ): void {
+    Utils::Map( DB::query(
+      commandSql: $this->ObterPersistedsEntitysInDatabase()
+    )->rows(), fn( array $row ) => $this->DefinePersistedsEntitys( $row ));
+  }
 
-      $requiredArr = $required === "sim"
-        ? [ "required" => "sim" ]
-        : [];
+  private function ObterPersistedsStatisticsInDatabase(
+    string $statisticsType    
+  ): string {
+    return Utils::Str(
+      "select information_schema.statistics.table_name as entity
+			       ,information_schema.statistics.index_name as statistics
+		     from information_schema.statistics 
+		    where information_schema.statistics.table_schema = '{$this->ObterDatabase()}'
+		      and information_schema.statistics.index_name like '{$statisticsType}_%'"
+    );
+  }
 
-      $this->entitysPersisteds[$entity][$name] = array_merge(
-        [ "type" => $type ], $autoincArr, $requiredArr,
-      );
-    });
+  private function DefinePersistedsStatistics(
+    array $StatisticsArr = []
+  ): void {
+    [ "entity" => $entity, "statistics" => $statistics ] = $StatisticsArr;
+
+    if ( preg_match("/^Idx/", $statistics )){
+      $this->persistedIndexes[$entity][] = $statistics;
+    } else $this->persistedUniques[$entity][] = $statistics;
+  }
+
+  private function ObterPersistedsIndexes(
+  ): void {
+    Utils::Map( DB::query(
+      commandSql: $this->ObterPersistedsStatisticsInDatabase("Idx")
+    )->rows(), fn( array $row ) => $this->DefinePersistedsStatistics( $row ));
+  } 
+
+  private function ObterPersistedsUniques(
+  ): void {
+    Utils::Map( DB::query(
+      commandSql: $this->ObterPersistedsStatisticsInDatabase("Unq")
+    )->rows(), fn( array $row ) => $this->DefinePersistedsStatistics( $row ));
+  }
+
+  private function ObterPersistedsForeignsInDatabase(
+  ): string {
+    return Utils::Str(
+      "select information_schema.referential_constraints.constraint_name as constranit
+  		   from information_schema.referential_constraints 
+  		  where constraint_schema = '{$this->ObterDatabase()}'"
+    );
+  }
+
+  private function ObterPersistedsForeigns(
+  ): void {
+    Utils::Map( DB::query(
+      commandSql: $this->ObterPersistedsForeignsInDatabase()
+    )->rows(), fn(array $row) => $this->persistedForeigns[] = $row[ "constranit" ]);
   }
 
   public function createEntityStructure(
@@ -341,52 +399,117 @@ class Migrations
     ));
   }
 
-  public function createScriptTable(
+  public function ExecuteScriptTable(
   ): void {
     Utils::MapKey($this->entitysCreateds, function(array $properties, string $entity){
       if (isset($this->entitysPersisteds[$entity]) === false) {
         $this->scriptArr[] = sprintf(
-          "create table if not exists `{$entity}` (%s)", implode(",", $properties)
+          "create table if not exists `{$entity}` (%s)", Utils::Join($properties)
         );
       }
     });
   }
 
-  public function createScriptIndexes(
-  ): void {
-    Utils::MapKey( $this->entitysCreatedsIndexes, fn(
-      array $constrantList, string $entity 
-    ) => Utils::Map( $constrantList, fn(array $constrant) => (
-      $this->scriptArr[] = "alter table `{$entity}` add index {$constrant[0]} ($constrant[1])"
-    )));
+  private function hasPersistedsIndex(
+    string $entity,
+    string $constraint,
+  ): bool {
+    if (isset($this->persistedIndexes[$entity])) {
+      return in_array($constraint, $this->persistedIndexes[$entity]);
+    } else return false;
   }
 
-  public function createScriptUniques(
+  private function ObterScriptAddIndex(
+    string $entity,
+    array $constraintArr = []
   ): void {
-    Utils::MapKey($this->entitysCreatedsUniques, fn(
-      array $constrantList, string $entity 
-    ) => Utils::Map( $constrantList, fn(array $constrant) => (
-      $this->scriptArr[] = "alter table `{$entity}` add unique {$constrant[0]} ($constrant[1])"
-    )));
+    [ $constraint, $properties ] = $constraintArr;
+    if ($this->hasPersistedsIndex( $entity, $constraint ) === false) {
+      $this->scriptArr[] = "alter table `{$entity}` add index {$constraint} ($properties)";
+    }
+  }
+
+  public function ExecuteScriptIndexes(
+  ): void {
+    Utils::MapKey( $this->entitysCreatedsIndexes, fn(array $constraints, string $entity) => (
+      Utils::Map( $constraints, fn(array $constraint) => $this->ObterScriptAddIndex($entity, $constraint))
+    ));
+
+    if (sizeof($this->entitysCreatedsIndexes) !== 0){
+      Utils::MapKey( $this->entitysCreatedsIndexes, fn(array $constraints, string $entity) => (
+        Utils::Map( array_diff(isset($this->persistedIndexes[$entity]) === true ? $this->persistedIndexes[$entity] : [], array_values( 
+          Utils::Map( $constraints, fn(array $constraint) => Utils::ArrayFirtsValue($constraint))
+        )), fn(string $contraint) => $this->scriptArr[] = "alter table `{$entity}` drop index `{$contraint}`" )
+      ));
+    } else {
+      Utils::MapKey($this->persistedIndexes, fn(array $constraints, string $entity) => (
+        Utils::Map($constraints, fn(string $contraint) => (
+          $this->scriptArr[] = "alter table `{$entity}` drop index `{$contraint}`"
+        ))
+      ));
+    }
+  }
+
+  private function hasPersistedsUnique(
+    string $entity,
+    string $constraint,
+  ): bool {
+    if (isset($this->persistedUniques[$entity])) {
+      return in_array($constraint, $this->persistedUniques[$entity]);
+    } else return false;
+  }  
+
+  private function ObterScriptAddUnique(
+    string $entity,
+    array $constraintArr = []
+  ): void {
+    [ $constraint, $properties ] = $constraintArr;
+    if ($this->hasPersistedsUnique( $entity, $constraint) === false) {
+      $this->scriptArr[] = "alter table `{$entity}` add unique {$constraint} ($properties)";
+    }
+  }
+
+  public function ExecuteScriptUniques(
+  ): void {
+    Utils::MapKey($this->entitysCreatedsUniques, fn( array $constrantList, string $entity) => (
+      Utils::Map( $constrantList, fn(array $constraint) => $this->ObterScriptAddUnique( $entity, $constraint ))
+    ));
+
+    if (sizeof($this->entitysCreatedsUniques) !== 0){
+      Utils::MapKey( $this->entitysCreatedsUniques, function(array $constraints, string $entity){
+        Utils::Map( array_diff( isset($this->persistedUniques[$entity]) === true ? $this->persistedUniques[$entity] : [], array_values( 
+          Utils::Map( $constraints, fn(array $constraint) => Utils::ArrayFirtsValue($constraint))
+        )), fn(string $contraint) => $this->scriptArr[] = "alter table `{$entity}` drop index `{$contraint}`" );
+      });
+    } else {
+      Utils::MapKey($this->persistedUniques, fn(array $constraints, string $entity) => (
+        Utils::Map($constraints, fn(string $contraint) => (
+          $this->scriptArr[] = "alter table `{$entity}` drop index `{$contraint}`"
+        ))
+      ));
+    }
+  }
+
+  private function ObterScriptAddForeigns(
+    string $entity,
+     array $constraint = []
+  ): void {
+    [ $reference, $referenceKey, $key ] = array_values( $constraint );
+    if ( in_array("Fk_{$reference}_in_{$entity}", $this->persistedForeigns) === false ) {
+      $this->scriptArr[] = "alter table `{$entity}` add constraint Fk_{$reference}_in_{$entity} foreign key ({$key}) references {$reference}({$referenceKey})";
+    }
   }
   
-  public function createScriptForeigns(
+  public function ExecuteScriptForeigns(
   ): void {
-    Utils::MapKey( $this->entitysCreatedsForeigns, fn(
-      array $foreignsList, string $entity
-    ) => Utils::Map( $foreignsList, fn( array $foreigns ) => (
-      $this->scriptArr[] = (
-        sprintf("alter table `{$entity}` add constraint FK_%s_in_{$entity} foreign key (%s) references %s(%s)",
-          $foreigns["ReferenceEntity"],
-          $foreigns["EntityKey"],
-          $foreigns["ReferenceEntity"],
-          $foreigns["ReferenceKey"]
-        )
-      )
-    )));
-  }
+    Utils::MapKey( $this->entitysCreatedsForeigns, fn( array $constraintArr, string $entity ) => (
+      Utils::Map( $constraintArr, fn( array $constraint ) => (
+        $this->ObterScriptAddForeigns( $entity, $constraint )
+      ))
+    ));
+  } 
 
-  public function updateScriptCollumns(
+  public function ExecuteScriptUpdateCols(
   ): void {
     Utils::MapKey( $this->entitysUpdates, fn(array $properties, string $entity) => (
       Utils::MapKey( $properties, function(array $attributes, string $property) use($entity) {
@@ -399,7 +522,7 @@ class Migrations
     ));
   }
 
-  public function insertScriptCollumns(
+  public function ExecuteScriptInsertCols(
   ): void {
     Utils::MapKey( $this->entitysInserts, fn(array $properties, string $entity) => (
       Utils::MapKey( $properties, function(array $attributes, string $property) use($entity) {
@@ -412,7 +535,7 @@ class Migrations
     ));
   } 
   
-  public function dropsScriptCollumns(
+  public function ExecuteScriptDropCols(
   ): void {
     Utils::MapKey( $this->entitysDrops, fn(array $properties, string $entity) => (
       Utils::MapKey( $properties, function(array $_, string $property) use($entity) {
@@ -421,23 +544,23 @@ class Migrations
     ));    
   }
 
-  public function createScriptExecute(
+  public function ExecuteScriptAll(
   ): void {
-    DB::query(
-      commandSql: $this->scriptArr
-    );
+    if (sizeof($this->scriptArr)) {
+      DB::query( commandSql: $this->scriptArr );
+    }
   }
 
   public function createScripts(
   ): void {
-    $this->createScriptTable();
-    $this->createScriptIndexes();
-    $this->createScriptUniques();
-    $this->createScriptForeigns();     
-    $this->updateScriptCollumns();
-    $this->insertScriptCollumns();
-    $this->dropsScriptCollumns();
-    $this->createScriptExecute();
+    $this->ExecuteScriptTable();
+    $this->ExecuteScriptIndexes();
+    $this->ExecuteScriptUniques();
+    $this->ExecuteScriptForeigns();
+    $this->ExecuteScriptUpdateCols();
+    $this->ExecuteScriptInsertCols();
+    $this->ExecuteScriptDropCols();
+    $this->ExecuteScriptAll();
   }
 
   public static function create(
