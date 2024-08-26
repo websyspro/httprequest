@@ -1,5 +1,5 @@
 vendor
-index.php
+*.php
 main.php
 *.sql
 docker
