@@ -11,7 +11,7 @@ class Date
 
   public function get(): array {
     return [
-      "type" => "Date"
+      "type" => "date"
     ];
   }
 }

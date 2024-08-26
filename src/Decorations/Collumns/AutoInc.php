@@ -11,7 +11,7 @@ class AutoInc
 
   public function get(): array {
     return [
-      "AutoInc" => "Sim"
+      "autoinc" => "sim"
     ];
   }
 }

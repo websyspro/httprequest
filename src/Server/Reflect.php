@@ -4,6 +4,7 @@ namespace Websyspro\HttpRequest\Server;
 
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionProperty;
 
 class Reflect
 {
@@ -59,5 +60,16 @@ class Reflect
       $reflectClass,
       $reflectMethod
     )->getAttributes();
-  }  
+  }
+  
+  public static function getAttronutesFromPropertys(
+    string $reflectClass,
+    string $reflectProperty 
+  ): array {
+    return (
+      new ReflectionProperty(
+        $reflectClass, $reflectProperty
+      )
+    )->getAttributes();
+  }
 }

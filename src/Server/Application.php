@@ -7,8 +7,16 @@ class Application
   public Request $request;
   public Response $response;
 
-  public static $defaultApiBase = "api/v1";
-  public static $defaultApiPort = "80";
+  public static string $defaultApiBase = "api/v1";
+  public static string $defaultApiPort = "80";
+
+  public static array $database = [
+    "host" => "localhost",
+    "user" => "root",
+    "pass" => "12345678",
+    "name" => "dataapi",
+    "port" => "3307"
+  ];
 
   public function __construct(
     public string $apiBase =  "api/v1",
@@ -17,20 +25,46 @@ class Application
     public array $entitys = []
   ) {
     $this->createApp();
+    $this->createEntitys();
     $this->createControllers();
   }
 
+  public function hasControllersList(
+  ): bool {
+    return is_array($this->controllers) 
+        && sizeof($this->controllers) !== 0; 
+  }
+
+  public function hasEntitysList(
+  ): bool {
+    return is_array($this->entitys) 
+        && sizeof($this->entitys) !== 0; 
+  }  
+
   public function createApp(
   ): void {
-    $this->request = Request::create($this);
-    $this->response = Response::create($this);
+    if($this->hasControllersList()){
+      $this->request = Request::create($this);
+      $this->response = Response::create($this);  
+    }
+  }
+
+  public function createEntitys(
+  ): void {
+    if ($this->hasEntitysList()) {
+      Migrations::create(
+        entitys: $this->entitys
+      );
+    }
   }
 
   public function createControllers(
   ): void {
-    $this->request->setControllers(
-      $this->controllers
-    );
+    if ($this->hasControllersList()){
+      $this->request->setControllers(
+        $this->controllers
+      );
+    }
   }
 
   public static function create(

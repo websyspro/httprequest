@@ -11,7 +11,7 @@ class SmallInt
 
   public function get(): array {
     return [
-      "type" => "SmallInt"
+      "type" => "smallint"
     ];
   }
 }

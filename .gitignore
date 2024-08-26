@@ -1,0 +1,5 @@
+vendor
+index.php
+main.php
+*.sql
+docker

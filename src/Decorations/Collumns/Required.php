@@ -11,7 +11,7 @@ class Required
 
   public function get(): array {
     return [
-      "required" => "Sim"
+      "required" => "sim"
     ];
   }
 }

@@ -11,7 +11,7 @@ class Decimal
 
   public function get(): array {
     return [
-      "type" => "Decimal(10,4)"
+      "type" => "decimal(10,4)"
     ];
   }
 }

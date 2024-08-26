@@ -13,7 +13,7 @@ class Varchar
 
   public function get(): array {
     return [
-      "type" => "Varchar({$this->size})"
+      "type" => "varchar({$this->size})"
     ];
   }
 }

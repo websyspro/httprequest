@@ -11,7 +11,7 @@ class BigInt
 
   public function get(): array {
     return [
-      "type" => "BigInt"
+      "type" => "bigint"
     ];
   }
 }

@@ -11,7 +11,7 @@ class Datetime
 
   public function get(): array {
     return [
-      "type" => "Datetime"
+      "type" => "datetime"
     ];
   }
 }

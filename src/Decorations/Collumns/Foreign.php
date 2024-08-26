@@ -8,14 +8,14 @@ use Attribute;
 class Foreign
 {
   public function __construct(
-    private string $ReferenceModel,
+    private string $ReferenceEntity,
     private string $ReferenceKey = "Id"
   ){}
 
   public function get(): array {
     return [
       "Foreign" => [
-        "ReferenceModel" => $this->ReferenceModel,
+        "ReferenceEntity" => $this->ReferenceEntity,
         "ReferenceKey" => $this->ReferenceKey
       ] 
     ];
