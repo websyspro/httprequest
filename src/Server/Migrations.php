@@ -36,18 +36,23 @@ class Migrations
 
   public function hasMigrations(
   ): bool {
-    [ "argv" => $argv,
-      "argc" => $argc ] = $_SERVER;
+    if (isset($_SERVER[ "argv" ]) === false) {
+      return false;
+    } else {
 
-    if ( (int)$argc >= 2 ) {
-      [ , $cmd ] = $argv;
+      [ "argv" => $argv,
+        "argc" => $argc ] = $_SERVER;
 
-      if (empty($cmd) === false) {
-        if ( $cmd === "migrate" ) {
-          return true;
+      if ( (int)$argc >= 2 ) {
+        [ , $cmd ] = $argv;
+
+        if (empty($cmd) === false) {
+          if ( $cmd === "migrate" ) {
+            return true;
+          } else return false;
         } else return false;
       } else return false;
-    } else return false;
+    }
   }
 
   public function getEntityName(
