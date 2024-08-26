@@ -580,12 +580,12 @@ class Migrations
   public function createScripts(
   ): void {
     $this->ExecuteScriptTable();
-    $this->ExecuteScriptIndexes();
-    $this->ExecuteScriptUniques();
-    $this->ExecuteScriptForeigns();
     $this->ExecuteScriptUpdateCols();
     $this->ExecuteScriptInsertCols();
     $this->ExecuteScriptDropCols();
+    $this->ExecuteScriptIndexes();
+    $this->ExecuteScriptUniques();
+    $this->ExecuteScriptForeigns();
     $this->ExecuteScriptAll();
   }
 
