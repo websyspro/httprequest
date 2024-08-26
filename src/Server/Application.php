@@ -35,7 +35,8 @@ class Application
   public function hasControllersList(
   ): bool {
     return is_array($this->controllers) 
-        && sizeof($this->controllers) !== 0; 
+        && sizeof($this->controllers) !== 0
+        && isset( $_SERVER["argv"] ) === false; 
   }
 
   public function hasEntitysList(
