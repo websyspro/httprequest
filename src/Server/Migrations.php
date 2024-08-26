@@ -563,7 +563,7 @@ class Migrations
         );
 
         if ($command->hasError()) {
-          $this->logsErr[] = $command->getError();
+          $this->logsErr[] = "Error: {$command->getError()} -> {$script}";
         }
       });
 
