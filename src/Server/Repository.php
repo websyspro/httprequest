@@ -2,6 +2,7 @@
 
 namespace Websyspro\HttpRequest\Server;
 use Websyspro\HttpRequest\Common\Utils;
+use Websyspro\HttpRequest\Server\Drivers\DB;
 
 class Repository
 {
@@ -35,7 +36,11 @@ class Repository
   }
 
   function findFirst(): array {
-    return [];
+    return DB::query(
+      "select * 
+         from {$this->getEntity()}
+     order by Id desc"
+    )->rows();
   }
 
   function findMany(
@@ -45,11 +50,22 @@ class Repository
       int $rowsPerPage = 0,
       int $page = 1
   ): array {
-    return [ $this->getEntity() ];
+    return DB::query(
+      "select * 
+         from {$this->getEntity()}"
+    )->rows();
   }
 
   function create(array $dataArr = []): array {
-    return [];
+    DB::query( sprintf(
+      "insert into {$this->getEntity()} values(%s)", Utils::Join(
+        Utils::MapKey($dataArr, fn(string $val, string $key) => (
+          "`{$key}`='{$val}'"
+        ))
+      )
+    ));
+
+    return $this->findFirst();
   }
 
   function update(array $dataArr = []): array {
