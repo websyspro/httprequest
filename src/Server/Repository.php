@@ -57,17 +57,29 @@ class Repository
   }
 
   function create(array $dataArr = []): array {
-    $dbResult = DB::query( sprintf(
+    $dataArr = array_merge(
+      $dataArr, [
+        "Actived" => 1,
+        "ActivedBy" => 1,
+        "ActivedAt" => date("Y-m-d H:i:s"),
+        "CreatedBy" => 1,
+        "CreatedAt" => date("Y-m-d H:i:s"),
+        "UpdatedBy" => 1,
+        "UpdatedAt" => date("Y-m-d H:i:s"),
+        "DeletedBy" => 1,
+        "DeletedAt" => date("Y-m-d H:i:s"),        
+      ]
+    );
+
+    $db = DB::query( sprintf(
       "insert into {$this->getEntity()} (%s) values(%s)", 
         Utils::Join( Utils::MapKey(array_keys($dataArr), fn($key) => "`{$key}`")),
         Utils::Join( Utils::MapKey($dataArr, fn($key) => "'{$key}'"))
     ));
 
-    return [ $dbResult->getError(), sprintf(
-      "insert into {$this->getEntity()} (%s) values(%s)", 
-        Utils::Join( Utils::MapKey(array_keys($dataArr), fn($key) => "`{$key}`")),
-        Utils::Join( Utils::MapKey($dataArr, fn($key) => "`{$key}`"))
-    )];
+    if ($db->hasError()){
+      return [ $db->getError() ];
+    } else return $this->findFirst();
   }
 
   function update(array $dataArr = []): array {
