@@ -31,6 +31,84 @@ class Repository
     );
   }
 
+  private function SelectFindMany(
+    array $Select = []
+  ):  string {
+    return is_array($Select) && sizeof($Select)
+      ? Utils::Join(
+          Utils::Map(
+            $Select, fn(string $key) => "`{$key}`")
+          )
+      : "*";
+  }
+
+  private function WhereFindMany(
+    array $Where = []
+  ): string {
+    if (is_array($Where) && sizeof($Where)) {
+      $Where = Utils::Join(
+        Utils::MapKey(
+          $Where, fn(string $val, string $key) => "{$key}='{$val}'"
+        )
+      );
+
+      return "where {$Where}";
+    } else return "where 1=1";
+  }
+
+  public function GroupByFindMany(
+    array $OrderBy = []
+  ): string {
+    return "";
+  }  
+
+  public function OrderByFindMany(
+    array $OrderBy = []
+  ): string {
+    return "order by 1 desc";
+  }
+
+  private function ObterPage(
+    int $Page, 
+    int $RowsPerPage = 0
+  ): string {
+    return bcsub(
+      $Page, 1, 0
+    ) * $RowsPerPage;
+  }
+
+  private function PagedFindMany(
+    int $RowsPerPage = 0,
+    int $Page = 1
+  ): string {
+    if ( $RowsPerPage !== 0 && $Page !== 0) {
+      return "limit {$this->ObterPage($Page, $RowsPerPage)}, {$RowsPerPage}";
+    } return "";
+  }  
+
+  public function findMany(
+      int $Id = 0,
+    array $Select = [],
+    array $Where = [],
+    array $OrderBy = [],
+    array $GroupBy = [],
+      int $RowsPerPage = 0,
+      int $Page = 1
+  ): DB {
+    $Where = array_merge(
+      $Where, $Id !== 0 ? [ "Id" => $Id ] : []
+    );
+
+    return DB::query(
+      "select {$this->SelectFindMany($Select)}
+         from {$this->ObterEntity()}
+              {$this->WhereFindMany($Where)}
+              {$this->GroupByFindMany($GroupBy)}
+              {$this->OrderByFindMany($OrderBy)}
+              {$this->PagedFindMany($Page, $RowsPerPage)}"
+    );
+  }
+
   public function findUnique(): array {
     return [];
   }
@@ -40,21 +118,8 @@ class Repository
       "select * 
          from {$this->ObterEntity()}
      order by Id desc limit 1"
-    )->rows();
-  }
-
-  public function findMany(
-    array $where = [],
-    array $orderBy = [],
-    array $groupBy = [],
-      int $rowsPerPage = 0,
-      int $page = 1
-  ): array {
-    return DB::query(
-      "select * 
-         from {$this->ObterEntity()}"
-    )->rows();
-  }
+    )->ObterRows();
+  }  
 
   private function ObterCreateDefaultValues(
     array $dataArr = []

@@ -47,7 +47,7 @@ class DB
     return empty($this->error) === false;
   }
   
-  public function getError(
+  public function ObterError(
   ): string {
     return $this->error;
   }
@@ -75,7 +75,7 @@ class DB
     }
   }
 
-  public function rows(
+  public function ObterRows(
   ): array {
     if ($this->record === false) {
       return [];
@@ -95,6 +95,12 @@ class DB
   ): DB {
     return new static(
       commandSql: $commandSql
+    );
+  }
+
+  public function ObterLastId(): int {
+    return mysqli_insert_id(
+      $this->handle
     );
   }
 }

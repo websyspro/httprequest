@@ -5,9 +5,10 @@ namespace Websyspro\HttpRequest\Common;
 class Utils
 {
   public static function Join(
-    array $arr = []
+    array $arr = [],
+    string $eparetor = ","
   ): string {
-    return implode( ",", $arr );
+    return implode( $eparetor, $arr );
   }
 
   public static function Split(

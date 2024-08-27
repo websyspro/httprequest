@@ -115,7 +115,7 @@ class Migrations
   ): void {
     Utils::Map( DB::query(
       commandSql: $this->ObterPersistedsEntitysInDatabase()
-    )->rows(), fn( array $row ) => $this->DefinePersistedsEntitys( $row ));
+    )->ObterRows(), fn( array $row ) => $this->DefinePersistedsEntitys( $row ));
   }
 
   private function ObterPersistedsStatisticsInDatabase(
@@ -144,14 +144,14 @@ class Migrations
   ): void {
     Utils::Map( DB::query(
       commandSql: $this->ObterPersistedsStatisticsInDatabase("Idx")
-    )->rows(), fn( array $row ) => $this->DefinePersistedsStatistics( $row ));
+    )->ObterRows(), fn( array $row ) => $this->DefinePersistedsStatistics( $row ));
   } 
 
   private function ObterPersistedsUniques(
   ): void {
     Utils::Map( DB::query(
       commandSql: $this->ObterPersistedsStatisticsInDatabase("Unq")
-    )->rows(), fn( array $row ) => $this->DefinePersistedsStatistics( $row ));
+    )->ObterRows(), fn( array $row ) => $this->DefinePersistedsStatistics( $row ));
   }
 
   private function ObterPersistedsForeignsInDatabase(
@@ -167,7 +167,7 @@ class Migrations
   ): void {
     Utils::Map( DB::query(
       commandSql: $this->ObterPersistedsForeignsInDatabase()
-    )->rows(), fn(array $row) => $this->persistedForeigns[] = $row[ "constranit" ]);
+    )->ObterRows(), fn(array $row) => $this->persistedForeigns[] = $row[ "constranit" ]);
   }
 
   public function createEntityStructure(
@@ -561,7 +561,7 @@ class Migrations
         );
 
         if ($command->hasError()) {
-          $this->logsErr[] = "Error: {$command->getError()} -> {$script}";
+          $this->logsErr[] = "Error: {$command->ObterError()} -> {$script}";
         }
       });
 
