@@ -1,6 +1,7 @@
 <?php
 
 namespace Websyspro\HttpRequest\Server;
+use Websyspro\HttpRequest\Common\Utils;
 
 class Repository
 {
@@ -17,7 +18,12 @@ class Repository
   }
 
   function getEntity(): string {
-    return "";
+    return Utils::ArrayLastValue(
+      Utils::Split(
+        texto: $this->entity,
+        separetor: "\\"
+      )
+    );
   }
 
   function findUnique(): array {
@@ -35,7 +41,7 @@ class Repository
       int $rowsPerPage = 0,
       int $page = 1
   ): array {
-    return [];
+    return [ $this->getEntity() ];
   }
 
   function create(array $dataArr = []): array {
