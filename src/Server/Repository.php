@@ -39,7 +39,7 @@ class Repository
     return DB::query(
       "select * 
          from {$this->getEntity()}
-     order by Id desc"
+     order by Id desc limit 1"
     )->rows();
   }
 
