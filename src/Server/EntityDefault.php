@@ -35,18 +35,14 @@ abstract class EntityDefault
   public string $CreatedAt;
   
   #[BigInt()]
-  #[Required()]
   public int $UpdatedBy;
   
   #[Datetime()]
-  #[Required()]
   public string $UpdatedAt;
   
   #[BigInt()]
-  #[Required()]
   public int $DeletedBy;
   
   #[Datetime()]
-  #[Required()]
   public string $DeletedAt;  
 }
