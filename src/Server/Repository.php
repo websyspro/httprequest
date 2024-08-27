@@ -65,13 +65,17 @@ class Repository
     //   )
     // ));
 
-    return [
-      "insert into {$this->getEntity()} values(%s)", Utils::Join(
-        Utils::MapKey($dataArr, fn(string $val, string $key) => (
-          "`{$key}`='{$val}'"
-        ))
-      )
-    ];
+    // return [
+    //   "insert into {$this->getEntity()} values(%s)", Utils::Join(
+    //     Utils::MapKey($dataArr, fn(string $val, string $key) => (
+    //       "`{$key}`='{$val}'"
+    //     ))
+    //   )
+    // ];
+
+    return Utils::MapKey($dataArr, fn(string $val, string $key) => (
+      "`{$key}`='{$val}'"
+    ));
   }
 
   function update(array $dataArr = []): array {
