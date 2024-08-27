@@ -31,11 +31,11 @@ class DB
   ): void {
     try{
       $this->handle = mysqli_connect(
-        Application::$config["database"]["host"],
-        Application::$config["database"]["user"],
-        Application::$config["database"]["pass"],
-        Application::$config["database"]["name"],
-        Application::$config["database"]["port"]
+        Application::$database["host"],
+        Application::$database["user"],
+        Application::$database["pass"],
+        Application::$database["name"],
+        Application::$database["port"]
       );
     } catch( Exception $error ) {
       $this->error = mysqli_connect_error();
