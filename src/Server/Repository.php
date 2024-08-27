@@ -10,7 +10,7 @@ class Repository
     private string $entity
   ){}
 
-  static function set(
+  public static function set(
     string $entity
   ): Repository {
     return new static(
@@ -18,7 +18,7 @@ class Repository
     );
   }
 
-  function getEntity(): string {
+  public function ObterEntity(): string {
     $fullEntity = Utils::ArrayLastValue(
       Utils::Split(
         texto: $this->entity,
@@ -31,19 +31,19 @@ class Repository
     );
   }
 
-  function findUnique(): array {
+  public function findUnique(): array {
     return [];
   }
 
-  function findFirst(): array {
+  public function findFirst(): array {
     return DB::query(
       "select * 
-         from {$this->getEntity()}
+         from {$this->ObterEntity()}
      order by Id desc limit 1"
     )->rows();
   }
 
-  function findMany(
+  public function findMany(
     array $where = [],
     array $orderBy = [],
     array $groupBy = [],
@@ -52,65 +52,87 @@ class Repository
   ): array {
     return DB::query(
       "select * 
-         from {$this->getEntity()}"
+         from {$this->ObterEntity()}"
     )->rows();
   }
 
-  function create(array $dataArr = []): array {
-    $dataArr = array_merge(
+  private function ObterCreateDefaultValues(
+    array $dataArr = []
+  ): array {
+    return array_merge(
       $dataArr, [
-        "Actived" => 1,
+        "Actived"   => 1,
         "ActivedBy" => 1,
-        "ActivedAt" => date("Y-m-d H:i:s"),
+        "ActivedAt" => Utils::Date(),
         "CreatedBy" => 1,
-        "CreatedAt" => date("Y-m-d H:i:s"),
-        "UpdatedBy" => 1,
-        "UpdatedAt" => date("Y-m-d H:i:s"),
-        "DeletedBy" => 1,
-        "DeletedAt" => date("Y-m-d H:i:s"),        
+        "CreatedAt" => Utils::Date(),        
       ]
     );
-
-    $db = DB::query( sprintf(
-      "insert into {$this->getEntity()} (%s) values(%s)", 
-        Utils::Join( Utils::MapKey(array_keys($dataArr), fn($key) => "`{$key}`")),
-        Utils::Join( Utils::MapKey($dataArr, fn($key) => "'{$key}'"))
-    ));
-
-    if ($db->hasError()){
-      return [ $db->getError() ];
-    } else return $this->findFirst();
   }
 
-  function update(array $dataArr = []): array {
+  private function ObterCreatePropsNames(
+    array $dataArr = []
+  ): string {
+    return Utils::Join(
+      Utils::MapKey(
+        array_keys(
+          $dataArr
+        ), fn($key) => "`{$key}`"
+      )
+    );
+  }
+
+  private function ObterCreatePropsValues(
+    array $dataArr = []
+  ): string {
+    return Utils::Join(
+      Utils::MapKey(
+        $dataArr, fn($key) => "'{$key}'"
+      )
+    );    
+  }
+
+  public function create(array $dataArr = []): DB {
+    $dataArr = $this->ObterCreateDefaultValues(
+      $dataArr
+    );
+    
+    return DB::query(
+      "insert into {$this->ObterEntity()} 
+        ({$this->ObterCreatePropsNames($dataArr)}) 
+          values({$this->ObterCreatePropsValues($dataArr)})"
+    );
+  }
+
+  public function update(array $dataArr = []): array {
     return [];
   }
 
-  function delete(array $dataArr = []): array {
+  public function delete(array $dataArr = []): array {
     return [];
   }
 
-  function createMany(array $dataManyArr = []): array {
+  public function createMany(array $dataManyArr = []): array {
     return [];
   }
  
-  function updateMany(array $dataManyArr = []): array {
+  public function updateMany(array $dataManyArr = []): array {
     return [];
   }
   
-  function deleteMany(array $dataManyArr = []): array {
+  public function deleteMany(array $dataManyArr = []): array {
     return [];
   }
   
-  function count(): int {
+  public function count(): int {
     return 0;
   }
 
-  function where(): Repository {
+  public function where(): Repository {
     return $this;
   }
 
-  function orderBy(): Repository {
+  public function orderBy(): Repository {
     return $this;
   }
 }

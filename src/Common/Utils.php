@@ -84,6 +84,10 @@ class Utils
     return $iterableArr;
   }
 
+  public static function Date(): string {
+    return date("Y-m-d H:i:s");
+  }
+
   public static function Str(
     string $strTexto
   ): string {
