@@ -20,7 +20,8 @@ class Repository
     array $where = [],
     array $orderBy = [],
     array $groupBy = [],
-      int $rowsPerPage = 0
+      int $rowsPerPage = 0,
+      int $page = 1
   ): array {
     return [];
   }
