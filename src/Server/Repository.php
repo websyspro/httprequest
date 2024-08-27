@@ -205,28 +205,30 @@ class Repository
     ));
   }
 
-  public function create(array $dataArr = []): DB {
+  public function create(array $dataArr = []): null | DB {
     $ParsePropertiesValues = $this->ParsePropertiesValues(
       $this->ObterCreateDefaultValues(
         $dataArr
       )
     );
 
-    if (is_array($ParsePropertiesValues) && sizeof($ParsePropertiesValues)) {
-      [ $properties ] = $ParsePropertiesValues;
-
-      $propertiesValues = Utils::Map(
-        $ParsePropertiesValues, fn(array $data) => Utils::Join(
-          array_values($data)
-        )
-      );
-
-      return DB::query(
-        "insert into {$this->ObterEntity()} 
-          ({$this->ObterCreatePropsNames($properties)}) 
-            values{$this->ObterCreatePropsValues($propertiesValues)}"
-      );      
+    if (is_array($ParsePropertiesValues) === false && sizeof($ParsePropertiesValues) === 0) {
+      return null;
     }
+
+    [ $properties ] = $ParsePropertiesValues;
+
+    $propertiesValues = Utils::Map(
+      $ParsePropertiesValues, fn(array $data) => Utils::Join(
+        array_values($data)
+      )
+    );
+
+    return DB::query(
+      "insert into {$this->ObterEntity()} 
+        ({$this->ObterCreatePropsNames($properties)}) 
+          values{$this->ObterCreatePropsValues($propertiesValues)}"
+    ); 
   }
 
   public function update(array $dataArr = []): array {
