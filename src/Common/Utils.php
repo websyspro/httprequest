@@ -18,6 +18,18 @@ class Utils
     );
   }
 
+  public static function ArrayLastValue(
+    mixed $iterable
+  ): string | Array | null {
+    $reverseIterable = array_reverse(
+      $iterable
+    );
+
+    return array_shift(
+      $reverseIterable
+    );
+  }
+
   public static function Map(
     mixed $iterable,
     callable $callable
