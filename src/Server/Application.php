@@ -27,7 +27,7 @@ class Application
   public function loadEnvs(
     ): void {
       if (defined("APP_ENVS")) {
-        parse_str(APP_ENVS, Application::$database);
+        parse_str( APP_ENVS , Application::$database);
       }
     }
 
