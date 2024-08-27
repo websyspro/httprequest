@@ -85,7 +85,7 @@ class Migrations
   }
 
   private function ObterDatabase(): string {
-    return Application::$config["database"]["name"];
+    return Application::$database["name"];
   }
 
   private function ObterPersistedsEntitysInDatabase(
