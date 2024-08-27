@@ -18,11 +18,15 @@ class Repository
   }
 
   function getEntity(): string {
-    return Utils::ArrayLastValue(
+    $fullEntity = Utils::ArrayLastValue(
       Utils::Split(
         texto: $this->entity,
         separetor: "\\"
       )
+    );
+
+    return preg_replace(
+      "/Entity$/", "", $fullEntity
     );
   }
 
