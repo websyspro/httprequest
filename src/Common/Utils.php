@@ -51,7 +51,7 @@ class Utils
   }
 
   public static function MapKey(
-    iterable $iterable,
+    mixed $iterable,
     callable $callable,
         array $iterableArr = []
   ): array {
