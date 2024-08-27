@@ -16,6 +16,10 @@ class Repository
     );
   }
 
+  function getEntity(): string {
+    return "";
+  }
+
   function findUnique(): array {
     return [];
   }

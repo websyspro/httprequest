@@ -10,6 +10,16 @@ class Utils
     return implode( ",", $arr );
   }
 
+  public static function Split(
+    string $texto,
+    string $separetor
+  ): array {
+    return explode(
+      $separetor,
+      $texto
+    );
+  }
+
   public static function ArrayFirtsValue(
     mixed $iterable
   ): string | Array | null {
