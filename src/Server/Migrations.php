@@ -181,17 +181,25 @@ class Migrations
     );
   }
 
-  public function loadEntity(
+  private function loadEntity(
     string $entity
   ): void {
     $this->entitysArr[
       $this->getEntityName($entity)
-    ] = $this->defineOrderProperties(
-      $this->laodEntityProperties($entity)
+    ] = Migrations::defineOrderProperties(
+      Migrations::ObterEntityProperties($entity)
     );
   }
 
-  public function laodEntityProperties(
+  public static function ObterEntityStructure(
+    string $Entity
+  ): array {
+    return Migrations::defineOrderProperties(
+      Migrations::ObterEntityProperties($Entity)
+    );
+  }
+
+  public static function ObterEntityProperties(
     string $entity,
      array $entityProperies = []
   ): array {
@@ -216,7 +224,7 @@ class Migrations
     });
   }
 
-  public function defineOrderProperties(
+  public static function defineOrderProperties(
     array $entityProperies = []
   ): array {
     return array_merge(

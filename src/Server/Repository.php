@@ -6,22 +6,41 @@ use Websyspro\HttpRequest\Server\Drivers\DB;
 
 class Repository
 {
+  private array $EntityProperties = [];
+
   function __construct(
-    private string $entity
-  ){}
+    private string $Entity
+  ){
+    $this->defineEntityProperties();
+  }
+
+  private function defineEntityProperties(
+  ): void {
+    $this->EntityProperties = Utils::MapKey(
+      Migrations::ObterEntityStructure($this->Entity),
+        function(array $property, string $key){
+          return [
+            "type" => preg_replace("/[0-9]|\(|\)/", "", $property["type"]),
+            "null" => isset($property["required"]) ? (
+                $property["required"] === "sim" ? true : false 
+              ) : false
+          ];
+        }
+    );
+  }
 
   public static function set(
-    string $entity
+    string $Entity
   ): Repository {
     return new static(
-      entity: $entity
+      Entity: $Entity
     );
   }
 
   public function ObterEntity(): string {
     $fullEntity = Utils::ArrayLastValue(
       Utils::Split(
-        texto: $this->entity,
+        texto: $this->Entity,
         separetor: "\\"
       )
     );
