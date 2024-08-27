@@ -5,8 +5,16 @@ namespace Websyspro\HttpRequest\Server;
 class Repository
 {
   function __construct(
-    private string $Entity
+    private string $entity
   ){}
+
+  static function set(
+    string $entity
+  ): Repository {
+    return new static(
+      entity: $entity
+    );
+  }
 
   function findUnique(): array {
     return [];
