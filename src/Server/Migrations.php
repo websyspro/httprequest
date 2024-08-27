@@ -59,8 +59,9 @@ class Migrations
   public function getEntityName(
     string $entity
   ): string {
+    $entityArr = explode("\\", $entity);
     return preg_replace(
-      "/Entity$/", "", $entity
+      "/Entity$/", "", end($entityArr)
     );
   }
 
@@ -70,8 +71,6 @@ class Migrations
     $this->ObterPersistedsIndexes();
     $this->ObterPersistedsUniques();
     $this->ObterPersistedsForeigns();
-
-
     $this->createEntityStructure();
     $this->createEntityStringSQL();
     $this->createEntityIndexeds();
@@ -80,7 +79,6 @@ class Migrations
     $this->updateEntityStructure();
     $this->insertEntityStructure();
     $this->dropsEntityStructure();
-
     $this->createScripts();
   }
 
