@@ -60,10 +60,10 @@ class Repository
     $dbResult = DB::query( sprintf(
       "insert into {$this->getEntity()} (%s) values(%s)", 
         Utils::Join( Utils::MapKey(array_keys($dataArr), fn($key) => "`{$key}`")),
-        Utils::Join( Utils::MapKey($dataArr, fn($key) => "`{$key}`"))
+        Utils::Join( Utils::MapKey($dataArr, fn($key) => "'{$key}'"))
     ));
 
-    return [ $dbResult, sprintf(
+    return [ $dbResult->getError(), sprintf(
       "insert into {$this->getEntity()} (%s) values(%s)", 
         Utils::Join( Utils::MapKey(array_keys($dataArr), fn($key) => "`{$key}`")),
         Utils::Join( Utils::MapKey($dataArr, fn($key) => "`{$key}`"))
