@@ -57,15 +57,21 @@ class Repository
   }
 
   function create(array $dataArr = []): array {
-    DB::query( sprintf(
+    // DB::query( sprintf(
+    //   "insert into {$this->getEntity()} values(%s)", Utils::Join(
+    //     Utils::MapKey($dataArr, fn(string $val, string $key) => (
+    //       "`{$key}`='{$val}'"
+    //     ))
+    //   )
+    // ));
+
+    return [
       "insert into {$this->getEntity()} values(%s)", Utils::Join(
         Utils::MapKey($dataArr, fn(string $val, string $key) => (
           "`{$key}`='{$val}'"
         ))
       )
-    ));
-
-    return $this->findFirst();
+    ];
   }
 
   function update(array $dataArr = []): array {
