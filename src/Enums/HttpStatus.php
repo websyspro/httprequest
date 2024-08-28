@@ -8,6 +8,7 @@ class HttpStatus
   public const Created = 201;
   public const Accepted = 202;
   public const NonAuthoritativeInformation = 203;
+  public const NoContent = 204;
   public const BadRequest = 400;
   public const Unauthorized = 401;
   public const PaymentRequired = 402;

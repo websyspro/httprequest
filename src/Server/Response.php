@@ -29,6 +29,14 @@ class Response
     );
   }
 
+  public function HeaderStatus(
+    int $httpStatus
+  ): void {
+    http_response_code(
+      $httpStatus
+    );
+  }  
+
   public static function HeaderError(
     int $HttpError
   ): void {
@@ -38,17 +46,31 @@ class Response
   }   
 
   public function Send(
-    mixed $Content
+    mixed $Content,
   ): void {
-    $this->HeaderJSON();
-    $this->HeaderStatusOk();
+    if ($Content instanceof HttpSuccess) {
+      $this->HeaderJSON();
+      $this->HeaderStatus(
+        $Content->Code
+      );
 
-    exit (
-      json_encode([
-        Response::success => true,
-        Response::content => $Content
-      ])
-    );
+      exit(
+        json_encode([
+          Response::success => true,
+          Response::content => $Content->Text
+        ])
+      );
+    } else {
+      $this->HeaderJSON();
+      $this->HeaderStatusOk();
+  
+      exit(
+        json_encode([
+          Response::success => true,
+          Response::content => $Content
+        ])
+      );  
+    }
   }
 
   public function Error(

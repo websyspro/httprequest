@@ -8,110 +8,110 @@ use Websyspro\HttpRequest\Enums\HttpTypeError;
 class HttpError
 {
   public function __construct(
-    public string $ExceptionText,
-    public string $ExceptionCode
+    public string $Text,
+    public string $Code
   ){
-    $this->ExceptionText = $ExceptionText;
-    $this->ExceptionCode = $ExceptionCode;
+    $this->Text = $Text;
+    $this->Code = $Code;
   }
 
   public static function NonAuthoritativeInformation(
-    string $ExceptionText = HttpTypeError::NonAuthoritativeInformation,
-       int $ExceptionCode = HttpStatus::NonAuthoritativeInformation
+    string $Text = HttpTypeError::NonAuthoritativeInformation,
+       int $Code = HttpStatus::NonAuthoritativeInformation
   ): HttpError {
     return new static(
-      $ExceptionText,
-      $ExceptionCode
+      $Text,
+      $Code
     );
   }  
 
   public static function BadRequest(
-    string $ExceptionText = HttpTypeError::BadRequest,
-       int $ExceptionCode = HttpStatus::BadRequest
+    string $Text = HttpTypeError::BadRequest,
+       int $Code = HttpStatus::BadRequest
   ): HttpError {
     return new static(
-      $ExceptionText,
-      $ExceptionCode
+      $Text,
+      $Code
     );
   }
 
   public static function Unauthorized(
-    string $ExceptionText = HttpTypeError::Unauthorized,
-       int $ExceptionCode = HttpStatus::Unauthorized
+    string $Text = HttpTypeError::Unauthorized,
+       int $Code = HttpStatus::Unauthorized
   ): HttpError {
     return new static(
-      $ExceptionText,
-      $ExceptionCode
+      $Text,
+      $Code
     );
   }
 
   public static function PaymentRequired(
-    string $ExceptionText = HttpTypeError::PaymentRequired,
-       int $ExceptionCode = HttpStatus::PaymentRequired
+    string $Text = HttpTypeError::PaymentRequired,
+       int $Code = HttpStatus::PaymentRequired
   ): HttpError {
     return new static(
-      $ExceptionText,
-      $ExceptionCode
+      $Text,
+      $Code
     );
   }  
 
   public static function Forbidden(
-    string $ExceptionText = HttpTypeError::Forbidden,
-       int $ExceptionCode = HttpStatus::Forbidden
+    string $Text = HttpTypeError::Forbidden,
+       int $Code = HttpStatus::Forbidden
   ): HttpError {
     return new static(
-      $ExceptionText,
-      $ExceptionCode
+      $Text,
+      $Code
     );
   }
 
   public static function NotFound(
-    string $ExceptionText = HttpTypeError::NotFound,
-       int $ExceptionCode = HttpStatus::NotFound 
+    string $Text = HttpTypeError::NotFound,
+       int $Code = HttpStatus::NotFound 
   ): HttpError {
     return new static(
-      $ExceptionText,
-      $ExceptionCode
+      $Text,
+      $Code
     );
   }  
 
   public static function MethodNotAllowed(
-    string $ExceptionText = HttpTypeError::MethodNotAllowed,
-       int $ExceptionCode = HttpStatus::MethodNotAllowed
+    string $Text = HttpTypeError::MethodNotAllowed,
+       int $Code = HttpStatus::MethodNotAllowed
   ): HttpError {
     return new static(
-      $ExceptionText,
-      $ExceptionCode
+      $Text,
+      $Code
     );
   }  
 
   public static function NotAcceptable(
-    string $ExceptionText = HttpTypeError::NotAcceptable,
-       int $ExceptionCode = HttpStatus::NotAcceptable    
+    string $Text = HttpTypeError::NotAcceptable,
+       int $Code = HttpStatus::NotAcceptable    
   ): HttpError {
     return new static(
-      $ExceptionText,
-      $ExceptionCode
+      $Text,
+      $Code
     );
   }  
 
   public static function ProxyAuthenticationRequired(
-    string $ExceptionText = HttpTypeError::ProxyAuthenticationRequired,
-       int $ExceptionCode = HttpStatus::ProxyAuthenticationRequired
+    string $Text = HttpTypeError::ProxyAuthenticationRequired,
+       int $Code = HttpStatus::ProxyAuthenticationRequired
   ): HttpError {
     return new static(
-      $ExceptionText,
-      $ExceptionCode
+      $Text,
+      $Code
     );
   }  
 
   public static function RequestTimeout(
-    string $ExceptionText = HttpTypeError::RequestTimeout,
-       int $ExceptionCode = HttpStatus::RequestTimeout
+    string $Text = HttpTypeError::RequestTimeout,
+       int $Code = HttpStatus::RequestTimeout
   ): HttpError {
     return new static(
-      $ExceptionText,
-      $ExceptionCode
+      $Text,
+      $Code
     );
   }  
 }

@@ -68,7 +68,7 @@ class Repository
       $Where = Utils::Join(
         Utils::MapKey(
           $Where, fn(string $val, string $key) => "{$key}='{$val}'"
-        )
+        ), " and "
       );
 
       return "where {$Where}";
@@ -115,9 +115,12 @@ class Repository
       int $Page = 1
   ): DB {
     $Where = array_merge(
-      $Where, $Id !== 0 ? [ "Id" => $Id ] : []
+      $Where, $Id !== 0 ? [ "Id" => $Id ] : [], [
+        "Actived" => 1,
+        "Deleted" => 0
+      ]
     );
-
+    
     return DB::query(
       "select {$this->SelectFindMany($Select)}
          from {$this->ObterEntity()}
@@ -150,11 +153,41 @@ class Repository
           "ActivedBy" => 1,
           "ActivedAt" => Utils::Date(),
           "CreatedBy" => 1,
-          "CreatedAt" => Utils::Date(),        
+          "CreatedAt" => Utils::Date(),
+          "Deleted"   => 0        
         ]
       )
     ));
   }
+
+  private function ObterUpdateDefaultValues(
+    array $dataArr = []
+  ): array {
+    return Utils::Map( $dataArr, fn($data) => (
+      array_merge(
+        (array)$data, [
+          "UpdatedBy" => 1,
+          "UpdatedAt" => Utils::Date(),        
+        ]
+      )
+    ));
+  }
+  
+  private function ObterDeleteDefaultValues(
+    array $dataArr = []
+  ): array {
+    return Utils::Map( $dataArr, fn($data) => (
+      array_merge(
+        (array)$data, [
+          "Actived"   => 0,
+          "ActivedBy" => 1, // Adiconar o user logado
+          "Deleted"   => 1,
+          "DeletedBy" => 1, // Adiconar o user logado
+          "DeletedAt" => Utils::Date(),        
+        ]
+      )
+    ));
+  }  
 
   private function ObterCreatePropsNames(
     array $dataArr = []
@@ -205,15 +238,15 @@ class Repository
     ));
   }
 
-  public function create(array $dataArr = []): null | DB {
+  public function Create(
+    array $dataArr = []
+  ): DB | bool {
     $ParsePropertiesValues = $this->ParsePropertiesValues(
-      $this->ObterCreateDefaultValues(
-        $dataArr
-      )
+      $this->ObterCreateDefaultValues( $dataArr )
     );
 
-    if (is_array($ParsePropertiesValues) === false && sizeof($ParsePropertiesValues) === 0) {
-      return null;
+    if ( Utils::IsArrayAndEmpty( $ParsePropertiesValues )) {
+      return false;
     }
 
     [ $properties ] = $ParsePropertiesValues;
@@ -231,12 +264,54 @@ class Repository
     ); 
   }
 
-  public function update(array $dataArr = []): array {
-    return [];
+  public function Update(
+    array $dataArr = []
+  ): DB | bool {
+    $ParsePropertiesValues = $this->ParsePropertiesValues(
+      $this->ObterUpdateDefaultValues( $dataArr )
+    );
+
+    if ( Utils::IsArrayAndEmpty( $ParsePropertiesValues )) {
+      return false;
+    }
+
+    $propertiesValues = Utils::Map($ParsePropertiesValues, fn(array $data) => (
+      [ $data["Id"], Utils::Join( Utils::MapKey(
+        $data, fn(string $val, string $key) => "`{$key}`={$val}" 
+      ))]
+    ));
+
+    $propertiesValues = Utils::Map($propertiesValues, function(array $dataUpdate){
+      [ $primaryKey, $dataArr ] = $dataUpdate;
+      return "update {$this->ObterEntity()} set {$dataArr} where `Id`={$primaryKey}";
+    });
+
+    return DB::query($propertiesValues);
   }
 
-  public function delete(array $dataArr = []): array {
-    return [];
+  public function Delete(
+    array $dataArr = []
+  ): DB | bool {
+    $ParsePropertiesValues = $this->ParsePropertiesValues(
+      $this->ObterDeleteDefaultValues( $dataArr )
+    );
+
+    if ( Utils::IsArrayAndEmpty( $ParsePropertiesValues )) {
+      return false;
+    }
+
+    $propertiesValues = Utils::Map($ParsePropertiesValues, fn(array $data) => (
+      [ $data["Id"], Utils::Join( Utils::MapKey(
+        $data, fn(string $val, string $key) => "`{$key}`={$val}" 
+      ))]
+    ));
+
+    $propertiesValues = Utils::Map($propertiesValues, function(array $dataUpdate){
+      [ $primaryKey, $dataArr ] = $dataUpdate;
+      return "update {$this->ObterEntity()} set {$dataArr} where `Id`={$primaryKey}";
+    });
+
+    return DB::query($propertiesValues);
   }
 
   public function createMany(array $dataManyArr = []): array {
@@ -249,17 +324,5 @@ class Repository
   
   public function deleteMany(array $dataManyArr = []): array {
     return [];
-  }
-  
-  public function count(): int {
-    return 0;
-  }
-
-  public function where(): Repository {
-    return $this;
-  }
-
-  public function orderBy(): Repository {
-    return $this;
   }
 }

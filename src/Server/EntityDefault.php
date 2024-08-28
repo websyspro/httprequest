@@ -5,6 +5,7 @@ use Websyspro\HttpRequest\Decorations\Collumns\AutoInc;
 use Websyspro\HttpRequest\Decorations\Collumns\BigInt;
 use Websyspro\HttpRequest\Decorations\Collumns\Datetime;
 use Websyspro\HttpRequest\Decorations\Collumns\Required;
+use Websyspro\HttpRequest\Decorations\Collumns\SmallInt;
 use Websyspro\HttpRequest\Decorations\Collumns\TinyInt;
 
 abstract class EntityDefault
@@ -39,6 +40,9 @@ abstract class EntityDefault
   
   #[Datetime()]
   public string $UpdatedAt;
+
+  #[TinyInt()]
+  public int $Deleted;
   
   #[BigInt()]
   public int $DeletedBy;

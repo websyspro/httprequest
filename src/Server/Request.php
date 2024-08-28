@@ -2,16 +2,11 @@
 
 namespace Websyspro\HttpRequest\Server;
 
-use ReflectionAttribute;
 use ReflectionClass;
-use ReflectionMethod;
-use ReflectionParameter;
-use ReflectionProperty;
 use Websyspro\HttpRequest\Common\Utils;
 use Websyspro\HttpRequest\Enums\ConstructStructure;
 use Websyspro\HttpRequest\Enums\ContentType;
 use Websyspro\HttpRequest\Enums\HttpStatus;
-use Websyspro\HttpRequest\Enums\Method;
 use Websyspro\HttpRequest\Enums\MiddlewareStructure;
 use Websyspro\HttpRequest\Enums\MultipartFormDataAttrs;
 use Websyspro\HttpRequest\Enums\RequestMethod;
@@ -297,8 +292,8 @@ class Request
 
             if ($resultControllerMethod instanceof HttpError){
               $this->application->response->Error(
-                $resultControllerMethod->ExceptionText,
-                $resultControllerMethod->ExceptionCode
+                $resultControllerMethod->Text,
+                $resultControllerMethod->Code
               );
             } else {
               $this->application->response->Send(

@@ -41,6 +41,13 @@ class Utils
     );
   }
 
+  public static function IsArrayAndEmpty(
+    mixed $mixedArr
+  ): bool {
+    return is_array($mixedArr) === true
+        && sizeof($mixedArr) === 0;
+  }
+
   public static function Map(
     mixed $iterable,
     callable $callable
@@ -93,5 +100,11 @@ class Utils
     string $strTexto
   ): string {
     return $strTexto;
+  }
+
+  public static function Logger(
+    string $log
+  ): void {
+    print $log . PHP_EOL;
   }
 }

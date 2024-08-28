@@ -22,7 +22,7 @@ class Migrations
   private array $persistedIndexes = [];
   private array $persistedUniques = [];
   private array $persistedForeigns = [];
-  
+  private array $persistedDropsForeigns = [];
   public array $entitysCreatedsUniques = [];
   public array $entitysCreatedsForeigns = [];
   public array $scriptArr = [];
@@ -235,12 +235,12 @@ class Migrations
       ),
       array_filter(
         $entityProperies, fn($key) => in_array($key, [
-          "Id", "Actived", "ActivedBy", "ActivedAt", "CreatedBy", "CreatedAt", "UpdatedBy", "UpdatedAt", "DeletedBy", "DeletedAt"
+          "Id", "Actived", "ActivedBy", "ActivedAt", "CreatedBy", "CreatedAt", "UpdatedBy", "UpdatedAt", "Deleted", "DeletedBy", "DeletedAt"
         ]) === false , ARRAY_FILTER_USE_KEY
       ),
       array_filter(
         $entityProperies, fn($key) => in_array($key, [
-          "Actived", "ActivedBy", "ActivedAt", "CreatedBy", "CreatedAt", "UpdatedBy", "UpdatedAt", "DeletedBy", "DeletedAt"
+          "Actived", "ActivedBy", "ActivedAt", "CreatedBy", "CreatedAt", "UpdatedBy", "UpdatedAt", "Deleted", "DeletedBy", "DeletedAt"
         ]) === true , ARRAY_FILTER_USE_KEY
       )
     );
@@ -506,16 +506,32 @@ class Migrations
     }
   }
 
+  private function ObterForeignsName(
+    string $entity,
+     array $constraint = []    
+  ): string {
+    [ $reference, $referenceKey ] = array_values( $constraint );
+    return "Fk_{$reference}_in_{$entity}_to_{$referenceKey}";
+  }  
+
   private function ObterScriptAddForeigns(
     string $entity,
      array $constraint = []
   ): void {
     [ $reference, $referenceKey, $key ] = array_values( $constraint );
-    if ( in_array("Fk_{$reference}_in_{$entity}", $this->persistedForeigns) === false ) {
-      $this->scriptArr[] = "alter table `{$entity}` add constraint Fk_{$reference}_in_{$entity} foreign key ({$key}) references {$reference}({$referenceKey})";
+    if ( in_array($this->ObterForeignsName($entity, $constraint), $this->persistedForeigns) === false ) {
+      $this->scriptArr[] = "alter table `{$entity}` add constraint {$this->ObterForeignsName($entity, $constraint)} foreign key ({$key}) references {$reference}({$referenceKey})";
     }
   }
-  
+
+  private function ObterScriptDropForeigns(
+    string $entity,
+    string $constraint
+  ): void {
+    $this->scriptArr[] = "alter table `{$entity}` drop foreign key `{$constraint}`";
+    $this->scriptArr[] = "alter table `{$entity}` drop index `{$constraint}`";
+  }  
+
   public function ExecuteScriptForeigns(
   ): void {
     Utils::MapKey( $this->entitysCreatedsForeigns, fn( array $constraintArr, string $entity ) => (
@@ -523,6 +539,36 @@ class Migrations
         $this->ObterScriptAddForeigns( $entity, $constraint )
       ))
     ));
+
+    Utils::MapKey( $this->entitysCreatedsForeigns, 
+      fn( array $constraints, string $entity) => (
+        Utils::Map( $constraints, fn( array $constraint) => (
+          $this->persistedDropsForeigns[$entity] = $this->ObterForeignsName(
+            $entity, $constraint
+          )
+        ))
+      )
+    );
+
+    if (sizeof($this->entitysCreatedsForeigns) !== 0) {
+      Utils::MapKey(
+        array_filter(
+          $this->persistedDropsForeigns, fn(string $constraint) => (
+            in_array( $constraint, $this->persistedForeigns )
+          )
+        ), function( string $constraint, string $entity) {
+          $this->ObterScriptDropForeigns($entity, $constraint);
+        }
+      );
+    } else if ( sizeof($this->persistedForeigns)) {
+      Utils::Map( $this->persistedForeigns, function( string $constraint ){
+        [ , , , $entity ] = explode(
+          "_", $constraint
+        );
+
+        $this->ObterScriptDropForeigns($entity, $constraint);
+      });
+    }
   } 
 
   public function ExecuteScriptUpdateCols(
@@ -568,18 +614,12 @@ class Migrations
           commandSql: $script
         );
 
+        Utils::Logger( "\x1b[32mExecute SQL: \x1b[37m{$script}." );
+
         if ($command->hasError()) {
-          $this->logsErr[] = "Error: {$command->ObterError()} -> {$script}";
+          Utils::Logger( " |-> \x1b[31mError SQL: \x1b[37m{$command->ObterError()}." );
         }
       });
-
-      if (sizeof($this->logsErr)) {
-        file_put_contents(
-          "logs.error", implode(
-            PHP_EOL, $this->logsErr
-          )
-        );
-      }
     }
   }
 
@@ -588,10 +628,10 @@ class Migrations
     $this->ExecuteScriptTable();
     $this->ExecuteScriptUpdateCols();
     $this->ExecuteScriptInsertCols();
-    $this->ExecuteScriptDropCols();
     $this->ExecuteScriptIndexes();
     $this->ExecuteScriptUniques();
     $this->ExecuteScriptForeigns();
+    $this->ExecuteScriptDropCols();
     $this->ExecuteScriptAll();
   }
 
